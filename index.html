@@ -330,6 +330,24 @@
             font-weight: 500;
         }
 
+        .preview-section-title {
+            margin: 1.5rem 0 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .preview-content {
+            margin-bottom: 2rem;
+        }
+
+        .preview-table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: var(--text-color);
+        }
+
         .action-buttons {
             display: flex;
             gap: 0.75rem;
@@ -771,6 +789,29 @@
         document.getElementById("cv-form").dispatchEvent(new Event('input'));
     }
 
+    // YEAR FORMATTER HELPER
+    function formatYear(val) {
+        if (!val) return '';
+        val = val.toString().trim();
+        // If it's exactly 4 digits, append '年'
+        if (/^\d{4}$/.test(val)) {
+            return val + '年';
+        }
+        return val;
+    }
+
+    // Attach year formatter to inputs
+    function attachYearFormatter(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('blur', function() {
+                this.value = formatYear(this.value);
+                // Trigger autosave
+                document.getElementById("cv-form").dispatchEvent(new Event('input'));
+            });
+        }
+    }
+
     // DYNAMIC FIELDS GENERATION
     function generateDynamicFields() {
         // Pendidikan (3 max)
@@ -784,13 +825,13 @@
                     </div>
                     <div class="row">
                         <div class="col form-group">
-                            <label ${i === 1 ? 'class="required"' : ''} for="edu_start_${i}">Tahun Mulai (contoh: 2014年)</label>
-                            <input type="text" id="edu_start_${i}" name="edu_start_${i}" ${i === 1 ? 'required' : ''}>
+                            <label ${i === 1 ? 'class="required"' : ''} for="edu_start_${i}">Tahun Mulai (hanya angka, misal: 2014)</label>
+                            <input type="text" id="edu_start_${i}" name="edu_start_${i}" ${i === 1 ? 'required' : ''} placeholder="Contoh: 2014">
                             <div class="error-message">Wajib diisi</div>
                         </div>
                         <div class="col form-group">
-                            <label ${i === 1 ? 'class="required"' : ''} for="edu_end_${i}">Tahun Lulus (contoh: 2020年)</label>
-                            <input type="text" id="edu_end_${i}" name="edu_end_${i}" ${i === 1 ? 'required' : ''}>
+                            <label ${i === 1 ? 'class="required"' : ''} for="edu_end_${i}">Tahun Lulus (hanya angka, misal: 2020)</label>
+                            <input type="text" id="edu_end_${i}" name="edu_end_${i}" ${i === 1 ? 'required' : ''} placeholder="Contoh: 2020">
                             <div class="error-message">Wajib diisi</div>
                         </div>
                     </div>
@@ -814,6 +855,11 @@
             `;
         }
         document.getElementById("pendidikan-container").innerHTML = eduHtml;
+        // Attach formatters
+        for (let i = 1; i <= 3; i++) {
+            attachYearFormatter(`edu_start_${i}`);
+            attachYearFormatter(`edu_end_${i}`);
+        }
 
         // Pekerjaan (2 max)
         let workHtml = '';
@@ -826,12 +872,12 @@
                     </div>
                     <div class="row">
                         <div class="col form-group">
-                            <label for="work_start_${i}">Tahun/Bulan Mulai</label>
-                            <input type="text" id="work_start_${i}" name="work_start_${i}">
+                            <label for="work_start_${i}">Tahun Mulai (hanya angka, misal: 2021)</label>
+                            <input type="text" id="work_start_${i}" name="work_start_${i}" placeholder="Contoh: 2021">
                         </div>
                         <div class="col form-group">
-                            <label for="work_end_${i}">Tahun/Bulan Selesai</label>
-                            <input type="text" id="work_end_${i}" name="work_end_${i}">
+                            <label for="work_end_${i}">Tahun Selesai (hanya angka, misal: 2023)</label>
+                            <input type="text" id="work_end_${i}" name="work_end_${i}" placeholder="Contoh: 2023">
                         </div>
                     </div>
                     <div class="row">
@@ -848,6 +894,11 @@
             `;
         }
         document.getElementById("pekerjaan-container").innerHTML = workHtml;
+        // Attach formatters
+        for (let i = 1; i <= 2; i++) {
+            attachYearFormatter(`work_start_${i}`);
+            attachYearFormatter(`work_end_${i}`);
+        }
 
         // Keluarga (4 max)
         let famHtml = '';
@@ -1179,13 +1230,80 @@
         const formData = new FormData(document.getElementById("cv-form"));
         const data = Object.fromEntries(formData.entries());
         
-        let html = '<table class="preview-table"><tbody>';
+        let html = '<div class="preview-content">';
+        
+        // Basic Info
+        html += '<h3 class="preview-section-title">Informasi Pribadi</h3>';
+        html += '<table class="preview-table"><tbody>';
         html += `<tr><th>Nama Lengkap</th><td>${data.nama}</td></tr>`;
         html += `<tr><th>Furigana</th><td>${data.furigana}</td></tr>`;
-        html += `<tr><th>Tanggal Lahir / Umur</th><td>${data.tgl_lahir} / ${data.umur} Tahun</td></tr>`;
-        html += `<tr><th>Kontak</th><td>${data.no_hp}</td></tr>`;
+        
+        let jpDate = '';
+        if (data.tgl_lahir) {
+            const date = new Date(data.tgl_lahir);
+            jpDate = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+        }
+        html += `<tr><th>Tanggal Lahir / Umur</th><td>${jpDate} / ${data.umur ? data.umur + '歳' : ''}</td></tr>`;
         html += `<tr><th>Alamat</th><td>${data.alamat}</td></tr>`;
+        html += `<tr><th>Kontak</th><td>${data.no_hp}</td></tr>`;
         html += '</tbody></table>';
+
+        // Physical & Health
+        html += '<h3 class="preview-section-title">Fisik & Kesehatan</h3>';
+        html += '<table class="preview-table"><tbody>';
+        html += `<tr><th>Tinggi / Berat</th><td>${data.tinggi} cm / ${data.berat} kg</td></tr>`;
+        html += `<tr><th>Penglihatan</th><td>Kanan: ${data.mata_kanan} / Kiri: ${data.mata_kiri}</td></tr>`;
+        html += `<tr><th>Buta Warna</th><td>${data.buta_warna}</td></tr>`;
+        html += `<tr><th>Merokok / Alkohol</th><td>${data.merokok} / ${data.alkohol}</td></tr>`;
+        html += '</tbody></table>';
+
+        // Education
+        html += '<h3 class="preview-section-title">Riwayat Pendidikan</h3>';
+        html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Sekolah</th><th>Status</th></tr></thead><tbody>';
+        for (let i = 1; i <= 3; i++) {
+            if (data[`edu_school_${i}`]) {
+                html += `<tr>
+                    <td>${formatYear(data[`edu_start_${i}`])} - ${formatYear(data[`edu_end_${i}`])}</td>
+                    <td>${data[`edu_school_${i}`]}</td>
+                    <td>${data[`edu_cert_${i}`]}</td>
+                </tr>`;
+            }
+        }
+        html += '</tbody></table>';
+
+        // Work
+        html += '<h3 class="preview-section-title">Riwayat Pekerjaan</h3>';
+        html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Perusahaan</th><th>Posisi</th></tr></thead><tbody>';
+        let hasWork = false;
+        for (let i = 1; i <= 2; i++) {
+            if (data[`work_company_${i}`]) {
+                hasWork = true;
+                html += `<tr>
+                    <td>${formatYear(data[`work_start_${i}`])} - ${formatYear(data[`work_end_${i}`])}</td>
+                    <td>${data[`work_company_${i}`]}</td>
+                    <td>${data[`work_job_${i}`]}</td>
+                </tr>`;
+            }
+        }
+        if (!hasWork) html += '<tr><td colspan="3" style="text-align:center;">Tidak ada riwayat pekerjaan</td></tr>';
+        html += '</tbody></table>';
+
+        // Family
+        html += '<h3 class="preview-section-title">Anggota Keluarga</h3>';
+        html += '<table class="preview-table"><thead><tr><th>Hubungan</th><th>Nama</th><th>Umur</th><th>Tinggal Bersama</th></tr></thead><tbody>';
+        for (let i = 1; i <= 4; i++) {
+            if (data[`fam_name_${i}`]) {
+                html += `<tr>
+                    <td>${data[`fam_rel_${i}`]}</td>
+                    <td>${data[`fam_name_${i}`]}</td>
+                    <td>${data[`fam_age_${i}`]}歳</td>
+                    <td>${data[`fam_together_${i}`] === '〇' ? 'Ya' : 'Tidak'}</td>
+                </tr>`;
+            }
+        }
+        html += '</tbody></table>';
+        
+        html += '</div>';
         
         document.getElementById("preview-container").innerHTML = html;
     }
@@ -1297,8 +1415,8 @@
             // Education (Rows 21, 22, 23)
             for(let i=1; i<=3; i++) {
                 const row = 20 + i;
-                updateCell(`A${row}`, data[`edu_start_${i}`]);
-                updateCell(`D${row}`, data[`edu_end_${i}`]);
+                updateCell(`A${row}`, formatYear(data[`edu_start_${i}`]));
+                updateCell(`D${row}`, formatYear(data[`edu_end_${i}`]));
                 updateCell(`F${row}`, data[`edu_school_${i}`]);
                 updateCell(`J${row}`, data[`edu_cert_${i}`]);
             }
@@ -1306,8 +1424,8 @@
             // Work Exp (Rows 28, 29)
             for(let i=1; i<=2; i++) {
                 const row = 27 + i;
-                updateCell(`A${row}`, data[`work_start_${i}`]);
-                updateCell(`D${row}`, data[`work_end_${i}`]);
+                updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
+                updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
                 updateCell(`F${row}`, data[`work_company_${i}`]);
                 updateCell(`J${row}`, data[`work_job_${i}`]);
             }
@@ -1387,10 +1505,10 @@
             alasan: "日本の技術を学び、将来インドネシアで自分の会社を作りたいです。",
             pekerjaan_nanti: "溶接工として働き、経験を活かしたいです。",
             pengalaman_visa: "無",
-            edu_start_1: "2009年", edu_end_1: "2015年", edu_school_1: "SDN 1 JAKARTA", edu_cert_1: "卒業証明書",
-            edu_start_2: "2015年", edu_end_2: "2018年", edu_school_2: "SMPN 1 JAKARTA", edu_cert_2: "卒業証明書",
-            edu_start_3: "2018年", edu_end_3: "2021年", edu_school_3: "SMKN 1 JAKARTA", edu_cert_3: "卒業証明書",
-            work_start_1: "2021年07月", work_end_1: "2023年08月", work_company_1: "PT MAJU MUNDUR", work_job_1: "溶接工",
+            edu_start_1: "2009", edu_end_1: "2015", edu_school_1: "SDN 1 JAKARTA", edu_cert_1: "卒業証明書",
+            edu_start_2: "2015", edu_end_2: "2018", edu_school_2: "SMPN 1 JAKARTA", edu_cert_2: "卒業証明書",
+            edu_start_3: "2018", edu_end_3: "2021", edu_school_3: "SMKN 1 JAKARTA", edu_cert_3: "卒業証明書",
+            work_start_1: "2021", work_end_1: "2023", work_company_1: "PT MAJU MUNDUR", work_job_1: "溶接工",
             fam_name_1: "SANTOSO", fam_rel_1: "父", fam_age_1: "50", fam_job_1: "会社員", fam_together_1: "〇",
             fam_name_2: "SITI", fam_rel_2: "母", fam_age_2: "45", fam_job_2: "主婦", fam_together_2: "〇",
             hobi: "サッカー、音楽鑑賞",
