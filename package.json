@@ -1,0 +1,19 @@
+{
+  "name": "template-cv-horenso",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx serve ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "jsdom": "^29.1.1",
+    "xlsx": "^0.18.5"
+  }
+}

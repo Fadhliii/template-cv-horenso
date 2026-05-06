@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Output / test files
+output_test.xlsx
+template_check.xlsx
+template_base64.txt
+
+# Test scripts (utility only)
+check_images.js
+check_photo.js
+convert_base64.js
+extract_template.js
+read_excel.js
+test_lanjut.js
+test_place.js
+test_remove.js
+test_validation.js
