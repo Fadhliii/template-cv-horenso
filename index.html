@@ -6,6 +6,9 @@
     <title>Formulir Pengisian CV LPK</title>
     <!-- ExcelJS from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <!-- Cropper.js from CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         img, video { max-width: 100%; height: auto; }
@@ -363,6 +366,45 @@
             padding: 0.6rem clamp(0.75rem, 3%, 1.5rem);
             font-size: clamp(0.85rem, 3.5vw, 1.1rem);
         }
+
+        /* Cropper Modal Styles */
+        .cropper-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .cropper-container-wrapper {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            max-width: 90%;
+            max-height: 80%;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cropper-area {
+            max-height: 400px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .cropper-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -397,6 +439,20 @@
                     <button type="button" onclick="hapusFoto()" style="display: block; margin: 10px auto 0; padding: 0.3rem 0.6rem; font-size: 0.85rem; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Hapus Foto</button>
                 </div>
                 <input type="hidden" id="foto_base64" name="foto_base64">
+            </div>
+
+            <!-- Cropper Modal -->
+            <div id="cropper-modal" class="cropper-modal-overlay">
+                <div class="cropper-container-wrapper">
+                    <h3 style="margin-top:0">Potong Foto (3:4)</h3>
+                    <div class="cropper-area">
+                        <img id="cropper-image" src="" style="max-width: 100%;">
+                    </div>
+                    <div class="cropper-footer">
+                        <button type="button" class="btn-secondary" onclick="closeCropper()">Batal</button>
+                        <button type="button" class="btn-primary" onclick="cropImage()">Potong & Simpan</button>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label class="required" for="nama">Nama Lengkap</label>
@@ -1670,23 +1726,68 @@ Data lengkap terlampir dalam format Excel.`;
     }
 
 
+    let cropper = null;
+
     function previewFoto(event) {
         const file = event.target.files[0];
         if (!file) return;
         
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran foto terlalu besar. Maksimal 2MB.');
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ukuran foto terlalu besar. Maksimal 5MB.');
             event.target.value = '';
             return;
         }
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('foto_preview').src = e.target.result;
-            document.getElementById('foto_base64').value = e.target.result;
-            document.getElementById('foto_preview_container').style.display = 'block';
+            const modal = document.getElementById('cropper-modal');
+            const img = document.getElementById('cropper-image');
+            img.src = e.target.result;
+            modal.style.display = 'flex';
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(img, {
+                aspectRatio: 3 / 4,
+                viewMode: 1,
+                autoCropArea: 1
+            });
         };
         reader.readAsDataURL(file);
+    }
+
+    function closeCropper() {
+        document.getElementById('cropper-modal').style.display = 'none';
+        document.getElementById('foto').value = '';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+
+    function cropImage() {
+        if (!cropper) return;
+
+        // Mendapatkan canvas hasil crop dengan ukuran yang layak (misal lebar 600px)
+        const canvas = cropper.getCroppedCanvas({
+            width: 600,
+            imageSmoothingQuality: 'high'
+        });
+
+        const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        
+        document.getElementById('foto_preview').src = croppedDataUrl;
+        document.getElementById('foto_base64').value = croppedDataUrl;
+        document.getElementById('foto_preview_container').style.display = 'block';
+        
+        document.getElementById('cropper-modal').style.display = 'none';
+        
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
     }
 
     function hapusFoto() {
