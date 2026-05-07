@@ -1709,24 +1709,47 @@ Data lengkap terlampir dalam format Excel.`;
             // Generate Excel File
             const file = await generateExcelFile();
 
-            // Try to use Web Share API
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: `CV ${nama}`,
-                    text: text
-                });
+            // Try to use Web Share API directly
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: `CV ${nama}`,
+                        text: text
+                    });
+                    // If success, we are done
+                } catch (shareError) {
+                    // If user cancelled (AbortError), don't show error but don't fallback
+                    if (shareError.name === 'AbortError') {
+                        return;
+                    }
+                    // For other errors (like Permission Denied), trigger fallback
+                    console.warn("Web Share failed, using fallback:", shareError);
+                    throw new Error("fallback");
+                }
             } else {
-                // Fallback to text-only WhatsApp link if sharing files not supported
-                const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis oleh browser ini. Silakan download Excel lalu kirim manual)");
-                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
-                alert("Browser ini tidak mendukung pengiriman file otomatis. Pesan teks telah disiapkan, silakan lampirkan file Excel secara manual setelah WhatsApp terbuka.");
+                throw new Error("not_supported");
             }
 
         } catch (error) {
-            if (error.name !== 'AbortError') {
+            if (error.message === "fallback" || error.message === "not_supported") {
+                const data = getFormData();
+                const nama = data.nama || 'Siswa LPK';
+                const hp = data.no_hp || '-';
+                const targetTabungan = data.target_tabungan || '-';
+                
+                const text = `Halo, ini data siswa LPK baru:
+Nama: ${nama}
+No. HP: ${hp}
+Target Tabungan: ${targetTabungan}
+Data lengkap terlampir dalam format Excel.`;
+
+                const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis. Silakan download Excel lalu kirim manual)");
+                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+                alert("Pengiriman file otomatis dibatasi oleh sistem/browser. Pesan teks telah disiapkan, silakan lampirkan file Excel secara manual setelah WhatsApp terbuka.");
+            } else {
                 console.error(error);
-                alert("Terjadi kesalahan saat membagikan ke WhatsApp: " + error.message);
+                alert("Terjadi kesalahan: " + error.message);
             }
         } finally {
             btn.innerHTML = originalText;
