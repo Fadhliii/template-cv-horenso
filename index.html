@@ -460,24 +460,9 @@
                     <div class="error-message">Wajib diisi</div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col form-group">
-                    <label class="required" for="mata_kanan">Mata Kanan</label>
-                    <div class="input-group">
-                        <input type="text" id="mata_kanan" name="mata_kanan" required placeholder="Contoh: 1.0">
-                        <button type="button" class="input-group-btn" onclick="document.getElementById('mata_kanan').value='1.0'; document.getElementById('mata_kanan').closest('.form-group').classList.remove('has-error'); document.getElementById('mata_kanan').dispatchEvent(new Event('input',{bubbles:true}));">Normal</button>
-                    </div>
-                    <div class="error-message">Wajib diisi</div>
-                </div>
-                <div class="col form-group">
-                    <label class="required" for="mata_kiri">Mata Kiri</label>
-                    <div class="input-group">
-                        <input type="text" id="mata_kiri" name="mata_kiri" required placeholder="Contoh: 1.0">
-                        <button type="button" class="input-group-btn" onclick="document.getElementById('mata_kiri').value='1.0'; document.getElementById('mata_kiri').closest('.form-group').classList.remove('has-error'); document.getElementById('mata_kiri').dispatchEvent(new Event('input',{bubbles:true}));">Normal</button>
-                    </div>
-                    <div class="error-message">Wajib diisi</div>
-                </div>
-            </div>
+            <!-- Hidden inputs for fixed eye vision values -->
+            <input type="hidden" id="mata_kanan" name="mata_kanan" value="1.0">
+            <input type="hidden" id="mata_kiri" name="mata_kiri" value="1.0">
             <div class="row">
                 <div class="col form-group">
                     <label class="required" for="buta_warna">Buta Warna</label>
@@ -861,9 +846,9 @@
             attachYearFormatter(`edu_end_${i}`);
         }
 
-        // Pekerjaan (3 max)
+        // Pekerjaan (4 max)
         let workHtml = '';
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             workHtml += `
                 <div class="repeated-group" id="pekerjaan_group_${i}" style="${i > 1 ? 'display: none;' : ''}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -895,7 +880,7 @@
         }
         document.getElementById("pekerjaan-container").innerHTML = workHtml;
         // Attach formatters
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             attachYearFormatter(`work_start_${i}`);
             attachYearFormatter(`work_end_${i}`);
         }
@@ -1190,14 +1175,14 @@
     // DYNAMIC ADD PEKERJAAN
     let currentKerjaCount = 1;
     function addKerja() {
-        if (currentKerjaCount < 3) {
+        if (currentKerjaCount < 4) {
             currentKerjaCount++;
             const group = document.getElementById(`pekerjaan_group_${currentKerjaCount}`);
             if (group) {
                 group.style.display = 'block';
                 group.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            if (currentKerjaCount >= 3) {
+            if (currentKerjaCount >= 4) {
                 document.getElementById('btn-add-pekerjaan').style.display = 'none';
             }
         }
@@ -1275,7 +1260,7 @@
         html += '<h3 class="preview-section-title">Riwayat Pekerjaan</h3>';
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Perusahaan</th><th>Posisi</th></tr></thead><tbody>';
         let hasWork = false;
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             if (data[`work_company_${i}`]) {
                 hasWork = true;
                 html += `<tr>
@@ -1415,8 +1400,8 @@
             updateCell(`J${row}`, data[`edu_cert_${i}`]);
         }
 
-        // Work Exp (Rows 28, 29, 30)
-        for(let i=1; i<=3; i++) {
+        // Work Exp (Rows 28, 29, 30, 31)
+        for(let i=1; i<=4; i++) {
             const row = 27 + i;
             updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
             updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
@@ -1564,14 +1549,14 @@
             document.getElementById('btn-add-pendidikan').style.display = 'none';
         }
 
-        for (let i = 2; i <= 3; i++) {
+        for (let i = 2; i <= 4; i++) {
             if (dummyData[`work_company_${i}`]) {
                 const grp = document.getElementById(`pekerjaan_group_${i}`);
                 if (grp) grp.style.display = 'block';
                 currentKerjaCount = i;
             }
         }
-        if (currentKerjaCount >= 3) {
+        if (currentKerjaCount >= 4) {
             document.getElementById('btn-add-pekerjaan').style.display = 'none';
         }
         
