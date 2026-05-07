@@ -1325,143 +1325,150 @@
         return bytes.buffer;
     }
 
+    async function generateExcelFile() {
+        const data = getFormData();
+        
+        // Parse template from base64
+        const buffer = base64ToArrayBuffer(TEMPLATE_BASE64);
+        
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+        const sheet = workbook.worksheets[0];
+
+        // Helper to update cell
+        function updateCell(cellAddress, value) {
+            if (value) {
+                const cell = sheet.getCell(cellAddress);
+                cell.value = value;
+            }
+        }
+
+        // Tambahkan Foto jika ada
+        if (data.foto_base64) {
+            let ext = 'jpeg';
+            if (data.foto_base64.indexOf('image/png') !== -1) ext = 'png';
+            const base64Data = data.foto_base64.split(',')[1];
+            
+            const imageId = workbook.addImage({
+                base64: base64Data,
+                extension: ext,
+            });
+            
+            // Ambil ukuran dan posisi pasti dari foto bawaan template (gambar ke-3)
+            let anchor = 'M2:O8';
+            if (sheet.getImages().length > 2) {
+                const oldImage = sheet.getImages()[2];
+                if (oldImage && oldImage.range) anchor = oldImage.range;
+            }
+            
+            // Hapus placeholder foto bawaan template agar tidak menumpuk
+            if (sheet._media && sheet._media.length > 2) {
+                sheet._media.splice(2, 1);
+            }
+            
+            // Menempatkan foto presisi di area foto yang lama
+            sheet.addImage(imageId, anchor);
+        }
+
+        // Map data to cells based on our analysis
+        updateCell('D4', data.furigana);
+        updateCell('J4', data.status_pernikahan);
+        updateCell('D5', data.nama);
+        updateCell('J5', data.golongan_darah);
+        
+        // Format DOB
+        if (data.tgl_lahir) {
+            const date = new Date(data.tgl_lahir);
+            const jpDate = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+            updateCell('D6', jpDate);
+        }
+        updateCell('J6', data.umur ? `${data.umur}歳` : '');
+        
+        updateCell('D7', data.alamat);
+        
+        updateCell('C9', Number(data.tinggi) || data.tinggi);
+        updateCell('G9', Number(data.berat) || data.berat);
+        updateCell('J9', `右目：${data.mata_kanan}\n左目：${data.mata_kiri}`);
+        updateCell('N9', data.buta_warna);
+        
+        updateCell('C10', data.tangan_dominan);
+        updateCell('G10', data.merokok);
+        updateCell('J10', data.alkohol);
+        updateCell('N10', data.riwayat_penyakit);
+        
+        updateCell('E12', data.mata_pelajaran);
+        updateCell('J12', data.pengalaman_asrama);
+        
+        updateCell('E13', data.pendapatan);
+        updateCell('J13', data.target_tabungan);
+        
+        updateCell('G15', data.alasan);
+        updateCell('G16', data.pekerjaan_nanti);
+        updateCell('G17', data.pengalaman_visa);
+
+        // Education (Rows 21, 22, 23)
+        for(let i=1; i<=3; i++) {
+            const row = 20 + i;
+            updateCell(`A${row}`, formatYear(data[`edu_start_${i}`]));
+            updateCell(`D${row}`, formatYear(data[`edu_end_${i}`]));
+            updateCell(`F${row}`, data[`edu_school_${i}`]);
+            updateCell(`J${row}`, data[`edu_cert_${i}`]);
+        }
+
+        // Work Exp (Rows 28, 29)
+        for(let i=1; i<=2; i++) {
+            const row = 27 + i;
+            updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
+            updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
+            updateCell(`F${row}`, data[`work_company_${i}`]);
+            updateCell(`J${row}`, data[`work_job_${i}`]);
+        }
+
+        // Family (Rows 34, 35, 36, 37)
+        for(let i=1; i<=4; i++) {
+            const row = 33 + i;
+            if(data[`fam_name_${i}`]) {
+                updateCell(`A${row}`, Number(i));
+                updateCell(`B${row}`, data[`fam_name_${i}`]);
+                updateCell(`H${row}`, data[`fam_rel_${i}`]);
+                updateCell(`I${row}`, data[`fam_age_${i}`] ? data[`fam_age_${i}`] + '歳' : '');
+                updateCell(`J${row}`, data[`fam_job_${i}`]);
+                
+                if (data[`fam_together_${i}`] === '〇') {
+                    updateCell(`K${row}`, '〇');
+                    updateCell(`N${row}`, '');
+                } else {
+                    updateCell(`K${row}`, '');
+                    updateCell(`N${row}`, '〇');
+                }
+            }
+        }
+
+        updateCell('A41', data.hobi);
+        updateCell('A43', data.kepribadian);
+        updateCell('A47', data.komitmen);
+
+        // Export with ExcelJS
+        const newBuffer = await workbook.xlsx.writeBuffer();
+        const safeName = (data.nama || 'CV').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const filename = `CV_${safeName}.xlsx`;
+        
+        const blob = new Blob([newBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        return new File([blob], filename, { type: blob.type });
+    }
+
     async function downloadExcel() {
+        const btn = document.getElementById("btn-download");
+        const originalText = btn.innerHTML;
         try {
-            const btn = document.getElementById("btn-download");
-            const originalText = btn.innerHTML;
             btn.innerHTML = "Memproses...";
             btn.disabled = true;
 
-            const data = getFormData();
-            
-            // Parse template from base64
-            const buffer = base64ToArrayBuffer(TEMPLATE_BASE64);
-            
-            const workbook = new ExcelJS.Workbook();
-            await workbook.xlsx.load(buffer);
-            const sheet = workbook.worksheets[0];
-
-            // Helper to update cell
-            function updateCell(cellAddress, value) {
-                if (value) {
-                    const cell = sheet.getCell(cellAddress);
-                    cell.value = value;
-                }
-            }
-
-            // Tambahkan Foto jika ada
-            if (data.foto_base64) {
-                let ext = 'jpeg';
-                if (data.foto_base64.indexOf('image/png') !== -1) ext = 'png';
-                const base64Data = data.foto_base64.split(',')[1];
-                
-                const imageId = workbook.addImage({
-                    base64: base64Data,
-                    extension: ext,
-                });
-                
-                // Ambil ukuran dan posisi pasti dari foto bawaan template (gambar ke-3)
-                let anchor = 'M2:O8';
-                if (sheet.getImages().length > 2) {
-                    const oldImage = sheet.getImages()[2];
-                    if (oldImage && oldImage.range) anchor = oldImage.range;
-                }
-                
-                // Hapus placeholder foto bawaan template agar tidak menumpuk
-                if (sheet._media && sheet._media.length > 2) {
-                    sheet._media.splice(2, 1);
-                }
-                
-                // Menempatkan foto presisi di area foto yang lama
-                sheet.addImage(imageId, anchor);
-            }
-
-            // Map data to cells based on our analysis
-            updateCell('D4', data.furigana);
-            updateCell('J4', data.status_pernikahan);
-            updateCell('D5', data.nama);
-            updateCell('J5', data.golongan_darah);
-            
-            // Format DOB
-            if (data.tgl_lahir) {
-                const date = new Date(data.tgl_lahir);
-                const jpDate = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
-                updateCell('D6', jpDate);
-            }
-            updateCell('J6', data.umur ? `${data.umur}歳` : '');
-            
-            updateCell('D7', data.alamat);
-            
-            updateCell('C9', Number(data.tinggi) || data.tinggi);
-            updateCell('G9', Number(data.berat) || data.berat);
-            updateCell('J9', `右目：${data.mata_kanan}\n左目：${data.mata_kiri}`);
-            updateCell('N9', data.buta_warna);
-            
-            updateCell('C10', data.tangan_dominan);
-            updateCell('G10', data.merokok);
-            updateCell('J10', data.alkohol);
-            updateCell('N10', data.riwayat_penyakit);
-            
-            updateCell('E12', data.mata_pelajaran);
-            updateCell('J12', data.pengalaman_asrama);
-            
-            updateCell('E13', data.pendapatan);
-            updateCell('J13', data.target_tabungan);
-            
-            updateCell('G15', data.alasan);
-            updateCell('G16', data.pekerjaan_nanti);
-            updateCell('G17', data.pengalaman_visa);
-
-            // Education (Rows 21, 22, 23)
-            for(let i=1; i<=3; i++) {
-                const row = 20 + i;
-                updateCell(`A${row}`, formatYear(data[`edu_start_${i}`]));
-                updateCell(`D${row}`, formatYear(data[`edu_end_${i}`]));
-                updateCell(`F${row}`, data[`edu_school_${i}`]);
-                updateCell(`J${row}`, data[`edu_cert_${i}`]);
-            }
-
-            // Work Exp (Rows 28, 29)
-            for(let i=1; i<=2; i++) {
-                const row = 27 + i;
-                updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
-                updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
-                updateCell(`F${row}`, data[`work_company_${i}`]);
-                updateCell(`J${row}`, data[`work_job_${i}`]);
-            }
-
-            // Family (Rows 34, 35, 36, 37)
-            for(let i=1; i<=4; i++) {
-                const row = 33 + i;
-                if(data[`fam_name_${i}`]) {
-                    updateCell(`A${row}`, Number(i));
-                    updateCell(`B${row}`, data[`fam_name_${i}`]);
-                    updateCell(`H${row}`, data[`fam_rel_${i}`]);
-                    updateCell(`I${row}`, data[`fam_age_${i}`] ? data[`fam_age_${i}`] + '歳' : '');
-                    updateCell(`J${row}`, data[`fam_job_${i}`]);
-                    
-                    if (data[`fam_together_${i}`] === '〇') {
-                        updateCell(`K${row}`, '〇');
-                        updateCell(`N${row}`, '');
-                    } else {
-                        updateCell(`K${row}`, '');
-                        updateCell(`N${row}`, '〇');
-                    }
-                }
-            }
-
-            updateCell('A41', data.hobi);
-            updateCell('A43', data.kepribadian);
-            updateCell('A47', data.komitmen);
-
-            // Export with ExcelJS
-            const newBuffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([newBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = window.URL.createObjectURL(blob);
+            const file = await generateExcelFile();
+            const url = window.URL.createObjectURL(file);
             const a = document.createElement('a');
             a.href = url;
-            const safeName = (data.nama || 'CV').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            a.download = `CV_${safeName}.xlsx`;
+            a.download = file.name;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1472,10 +1479,11 @@
         } catch (error) {
             console.error(error);
             alert("Terjadi kesalahan saat membuat file Excel: " + error.message);
-            document.getElementById("btn-download").innerHTML = "Download Excel Error";
-            document.getElementById("btn-download").disabled = false;
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     }
+
 
     // SHARE WHATSAPP
     function fillFakeData() {
@@ -1627,21 +1635,53 @@
         document.getElementById("cv-form").dispatchEvent(new Event('input'));
     }
 
-    function shareWhatsApp() {
-        const data = getFormData();
-        const nama = data.nama || 'Siswa LPK';
-        const hp = data.no_hp || '-';
-        const targetTabungan = data.target_tabungan || '-';
+    async function shareWhatsApp() {
+        const btn = document.getElementById("btn-wa");
+        const originalText = btn.innerHTML;
         
-        const text = `Halo, ini data siswa LPK baru:
+        try {
+            btn.innerHTML = "Memproses...";
+            btn.disabled = true;
+
+            const data = getFormData();
+            const nama = data.nama || 'Siswa LPK';
+            const hp = data.no_hp || '-';
+            const targetTabungan = data.target_tabungan || '-';
+            
+            const text = `Halo, ini data siswa LPK baru:
 Nama: ${nama}
 No. HP: ${hp}
 Target Tabungan: ${targetTabungan}
-Data lengkap telah diisi melalui sistem.`;
-        
-        const encodedText = encodeURIComponent(text);
-        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+Data lengkap terlampir dalam format Excel.`;
+
+            // Generate Excel File
+            const file = await generateExcelFile();
+
+            // Try to use Web Share API
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: `CV ${nama}`,
+                    text: text
+                });
+            } else {
+                // Fallback to text-only WhatsApp link if sharing files not supported
+                const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis oleh browser ini. Silakan download Excel lalu kirim manual)");
+                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+                alert("Browser ini tidak mendukung pengiriman file otomatis. Pesan teks telah disiapkan, silakan lampirkan file Excel secara manual setelah WhatsApp terbuka.");
+            }
+
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error(error);
+                alert("Terjadi kesalahan saat membagikan ke WhatsApp: " + error.message);
+            }
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
+
 
     function previewFoto(event) {
         const file = event.target.files[0];
