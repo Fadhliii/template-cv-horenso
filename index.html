@@ -814,9 +814,9 @@
 
     // DYNAMIC FIELDS GENERATION
     function generateDynamicFields() {
-        // Pendidikan (3 max)
+        // Pendidikan (4 max)
         let eduHtml = '';
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             eduHtml += `
                 <div class="repeated-group" id="pendidikan_group_${i}" style="${i > 1 ? 'display: none;' : ''}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -856,14 +856,14 @@
         }
         document.getElementById("pendidikan-container").innerHTML = eduHtml;
         // Attach formatters
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             attachYearFormatter(`edu_start_${i}`);
             attachYearFormatter(`edu_end_${i}`);
         }
 
-        // Pekerjaan (2 max)
+        // Pekerjaan (3 max)
         let workHtml = '';
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 3; i++) {
             workHtml += `
                 <div class="repeated-group" id="pekerjaan_group_${i}" style="${i > 1 ? 'display: none;' : ''}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -895,7 +895,7 @@
         }
         document.getElementById("pekerjaan-container").innerHTML = workHtml;
         // Attach formatters
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 3; i++) {
             attachYearFormatter(`work_start_${i}`);
             attachYearFormatter(`work_end_${i}`);
         }
@@ -1152,14 +1152,14 @@
     // DYNAMIC ADD PENDIDIKAN
     let currentPendidikanCount = 1;
     function addPendidikan() {
-        if (currentPendidikanCount < 3) {
+        if (currentPendidikanCount < 4) {
             currentPendidikanCount++;
             const group = document.getElementById(`pendidikan_group_${currentPendidikanCount}`);
             if (group) {
                 group.style.display = 'block';
                 group.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            if (currentPendidikanCount >= 3) {
+            if (currentPendidikanCount >= 4) {
                 document.getElementById('btn-add-pendidikan').style.display = 'none';
             }
         }
@@ -1190,14 +1190,14 @@
     // DYNAMIC ADD PEKERJAAN
     let currentKerjaCount = 1;
     function addKerja() {
-        if (currentKerjaCount < 2) {
+        if (currentKerjaCount < 3) {
             currentKerjaCount++;
             const group = document.getElementById(`pekerjaan_group_${currentKerjaCount}`);
             if (group) {
                 group.style.display = 'block';
                 group.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            if (currentKerjaCount >= 2) {
+            if (currentKerjaCount >= 3) {
                 document.getElementById('btn-add-pekerjaan').style.display = 'none';
             }
         }
@@ -1260,7 +1260,7 @@
         // Education
         html += '<h3 class="preview-section-title">Riwayat Pendidikan</h3>';
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Sekolah</th><th>Status</th></tr></thead><tbody>';
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             if (data[`edu_school_${i}`]) {
                 html += `<tr>
                     <td>${formatYear(data[`edu_start_${i}`])} - ${formatYear(data[`edu_end_${i}`])}</td>
@@ -1275,7 +1275,7 @@
         html += '<h3 class="preview-section-title">Riwayat Pekerjaan</h3>';
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Perusahaan</th><th>Posisi</th></tr></thead><tbody>';
         let hasWork = false;
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 3; i++) {
             if (data[`work_company_${i}`]) {
                 hasWork = true;
                 html += `<tr>
@@ -1406,8 +1406,8 @@
         updateCell('G16', data.pekerjaan_nanti);
         updateCell('G17', data.pengalaman_visa);
 
-        // Education (Rows 21, 22, 23)
-        for(let i=1; i<=3; i++) {
+        // Education (Rows 21, 22, 23, 24)
+        for(let i=1; i<=4; i++) {
             const row = 20 + i;
             updateCell(`A${row}`, formatYear(data[`edu_start_${i}`]));
             updateCell(`D${row}`, formatYear(data[`edu_end_${i}`]));
@@ -1415,8 +1415,8 @@
             updateCell(`J${row}`, data[`edu_cert_${i}`]);
         }
 
-        // Work Exp (Rows 28, 29)
-        for(let i=1; i<=2; i++) {
+        // Work Exp (Rows 28, 29, 30)
+        for(let i=1; i<=3; i++) {
             const row = 27 + i;
             updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
             updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
@@ -1553,25 +1553,25 @@
             document.getElementById('btn-add-keluarga').style.display = 'none';
         }
 
-        for (let i = 2; i <= 3; i++) {
+        for (let i = 2; i <= 4; i++) {
             if (dummyData[`edu_school_${i}`]) {
                 const grp = document.getElementById(`pendidikan_group_${i}`);
                 if (grp) grp.style.display = 'block';
                 currentPendidikanCount = i;
             }
         }
-        if (currentPendidikanCount >= 3) {
+        if (currentPendidikanCount >= 4) {
             document.getElementById('btn-add-pendidikan').style.display = 'none';
         }
 
-        for (let i = 2; i <= 2; i++) {
+        for (let i = 2; i <= 3; i++) {
             if (dummyData[`work_company_${i}`]) {
                 const grp = document.getElementById(`pekerjaan_group_${i}`);
                 if (grp) grp.style.display = 'block';
                 currentKerjaCount = i;
             }
         }
-        if (currentKerjaCount >= 2) {
+        if (currentKerjaCount >= 3) {
             document.getElementById('btn-add-pekerjaan').style.display = 'none';
         }
         
