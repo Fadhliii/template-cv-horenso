@@ -1748,7 +1748,8 @@ Target Tabungan: ${targetTabungan}
 Data lengkap terlampir dalam format Excel.`;
 
                 const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis. Silakan download Excel lalu kirim manual)");
-                const waUrl = `https://wa.me/?text=${encodedText}`;
+                // Using api.whatsapp.com for better deep-linking support on browsers like Brave
+                const waUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
                 
                 // Try several methods to open the link to bypass pop-up blockers
                 const newWindow = window.open(waUrl, '_blank');
