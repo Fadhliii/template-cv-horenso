@@ -1703,66 +1703,58 @@
             const hp = data.no_hp || '-';
             const targetTabungan = data.target_tabungan || '-';
             
-            const text = `Halo, ini data siswa LPK baru:
-Nama: ${nama}
-No. HP: ${hp}
-Target Tabungan: ${targetTabungan}
-Data lengkap terlampir dalam format Excel.`;
+            const text = `Halo, ini data siswa LPK baru:\nNama: ${nama}\nNo. HP: ${hp}\nTarget Tabungan: ${targetTabungan}\nData lengkap terlampir dalam format Excel.`;
 
             // Generate Excel File
             const file = await generateExcelFile();
 
-            // Try to use Web Share API directly
-            if (navigator.share) {
+            // Check if Web Share API is available AND can share the file
+            let shared = false;
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
                         files: [file],
                         title: `CV ${nama}`,
                         text: text
                     });
-                    // If success, we are done
+                    shared = true;
                 } catch (shareError) {
-                    // If user cancelled (AbortError), don't show error but don't fallback
                     if (shareError.name === 'AbortError') {
+                        // User cancelled the share sheet
                         return;
                     }
-                    // For other errors (like Permission Denied), trigger fallback
                     console.warn("Web Share failed, using fallback:", shareError);
-                    throw new Error("fallback");
                 }
-            } else {
-                throw new Error("not_supported");
             }
 
-        } catch (error) {
-            if (error.message === "fallback" || error.message === "not_supported") {
-                const data = getFormData();
-                const nama = data.nama || 'Siswa LPK';
-                const hp = data.no_hp || '-';
-                const targetTabungan = data.target_tabungan || '-';
+            if (!shared) {
+                // Fallback: Auto-download and Open WhatsApp Link
                 
-                const text = `Halo, ini data siswa LPK baru:
-Nama: ${nama}
-No. HP: ${hp}
-Target Tabungan: ${targetTabungan}
-Data lengkap terlampir dalam format Excel.`;
+                // 1. Trigger Download
+                const url = window.URL.createObjectURL(file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
 
-                const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis. Silakan download Excel lalu kirim manual)");
-                // Using api.whatsapp.com for better deep-linking support on browsers like Brave
+                // 2. Open WhatsApp
+                const encodedText = encodeURIComponent(text + "\n\n(File Excel terunduh otomatis. Silakan lampirkan file tersebut secara manual)");
                 const waUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
                 
-                // Try several methods to open the link to bypass pop-up blockers
                 const newWindow = window.open(waUrl, '_blank');
                 if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                    // If window.open is blocked, try direct location change as last resort
                     window.location.href = waUrl;
                 }
                 
-                alert("Pengiriman file otomatis dibatasi oleh sistem/browser. Pesan teks telah disiapkan, silakan lampirkan file Excel secara manual setelah WhatsApp terbuka.");
-            } else {
-                console.error(error);
-                alert("Terjadi kesalahan: " + error.message);
+                alert("File Excel telah diunduh otomatis karena batasan sistem/browser.\n\nSilakan lampirkan file '" + file.name + "' secara manual setelah WhatsApp terbuka.");
             }
+
+        } catch (error) {
+            console.error(error);
+            alert("Terjadi kesalahan: " + error.message);
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
