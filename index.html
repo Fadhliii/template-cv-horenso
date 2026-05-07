@@ -436,7 +436,10 @@
                 <input type="file" id="foto" name="foto" accept="image/jpeg, image/png" onchange="previewFoto(event)">
                 <div id="foto_preview_container" style="margin-top: 10px; display: none; text-align: center;">
                     <img id="foto_preview" src="" alt="Preview Foto" style="max-width: 120px; border: 1px solid #ccc; border-radius: 4px;">
-                    <button type="button" onclick="hapusFoto()" style="display: block; margin: 10px auto 0; padding: 0.3rem 0.6rem; font-size: 0.85rem; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Hapus Foto</button>
+                    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                        <button type="button" onclick="editFoto()" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Edit Foto</button>
+                        <button type="button" onclick="hapusFoto()" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Hapus Foto</button>
+                    </div>
                 </div>
                 <input type="hidden" id="foto_base64" name="foto_base64">
             </div>
@@ -1733,6 +1736,7 @@ Data lengkap terlampir dalam format Excel.`;
 
 
     let cropper = null;
+    let originalImageData = null;
 
     function previewFoto(event) {
         const file = event.target.files[0];
@@ -1746,23 +1750,36 @@ Data lengkap terlampir dalam format Excel.`;
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            const modal = document.getElementById('cropper-modal');
-            const img = document.getElementById('cropper-image');
-            img.src = e.target.result;
-            modal.style.display = 'flex';
-
-            if (cropper) {
-                cropper.destroy();
-            }
-
-            cropper = new Cropper(img, {
-                aspectRatio: 3 / 4,
-                viewMode: 1,
-                autoCropArea: 1
-            });
+            originalImageData = e.target.result;
+            openCropper(originalImageData);
         };
         reader.readAsDataURL(file);
     }
+    function openCropper(imageData) {
+        const modal = document.getElementById('cropper-modal');
+        const img = document.getElementById('cropper-image');
+        img.src = imageData;
+        modal.style.display = 'flex';
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(img, {
+            aspectRatio: 3 / 4,
+            viewMode: 1,
+            autoCropArea: 1
+        });
+    }
+
+    function editFoto() {
+        if (originalImageData) {
+            openCropper(originalImageData);
+        } else {
+            alert("Tidak ada data foto asli untuk diedit.");
+        }
+    }
+
 
     function closeCropper() {
         document.getElementById('cropper-modal').style.display = 'none';
@@ -1807,6 +1824,7 @@ Data lengkap terlampir dalam format Excel.`;
         document.getElementById('foto_base64').value = '';
         document.getElementById('foto_preview').src = '';
         document.getElementById('foto_preview_container').style.display = 'none';
+        originalImageData = null;
     }
 </script>
 </body>
