@@ -728,9 +728,12 @@
                 </button>
                 <button type="button" class="btn-success" id="btn-wa">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                    Share via WhatsApp
+                    Share WhatsApp
                 </button>
             </div>
+            <p style="text-align: center; font-size: 0.85rem; color: #5f6368; margin-top: 1rem;">
+                * Jika Share WhatsApp tidak muncul, silakan Download Excel lalu kirim manual.
+            </p>
         </div>
 
         <div class="btn-group">
@@ -1745,7 +1748,15 @@ Target Tabungan: ${targetTabungan}
 Data lengkap terlampir dalam format Excel.`;
 
                 const encodedText = encodeURIComponent(text + "\n\n(File Excel tidak dapat dilampirkan otomatis. Silakan download Excel lalu kirim manual)");
-                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+                const waUrl = `https://wa.me/?text=${encodedText}`;
+                
+                // Try several methods to open the link to bypass pop-up blockers
+                const newWindow = window.open(waUrl, '_blank');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    // If window.open is blocked, try direct location change as last resort
+                    window.location.href = waUrl;
+                }
+                
                 alert("Pengiriman file otomatis dibatasi oleh sistem/browser. Pesan teks telah disiapkan, silakan lampirkan file Excel secara manual setelah WhatsApp terbuka.");
             } else {
                 console.error(error);
