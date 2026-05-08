@@ -405,6 +405,75 @@
             justify-content: flex-end;
             gap: 10px;
         }
+
+        /* WhatsApp Modal Styles */
+        .whatsapp-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .whatsapp-modal-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .whatsapp-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            color: #128c7e;
+        }
+
+        .whatsapp-modal-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .whatsapp-modal-body {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .whatsapp-modal-body p {
+            margin-top: 0;
+            color: #444;
+        }
+
+        .whatsapp-modal-body ol {
+            padding-left: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .whatsapp-modal-body li {
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .whatsapp-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
     </style>
 </head>
 <body>
@@ -444,25 +513,7 @@
                 <input type="hidden" id="foto_base64" name="foto_base64">
             </div>
 
-            <!-- Cropper Modal -->
-            <div id="cropper-modal" class="cropper-modal-overlay">
-                <div class="cropper-container-wrapper">
-                    <h3 style="margin-top:0">Potong Foto (3:4)</h3>
-                    <div class="cropper-area">
-                        <img id="cropper-image" src="" style="max-width: 100%;">
-                    </div>
-                    <div class="cropper-footer" style="justify-content: space-between;">
-                        <div style="display: flex; gap: 5px;">
-                            <button type="button" class="btn-secondary" onclick="rotateCropper(-90)" title="Rotate Left">↺</button>
-                            <button type="button" class="btn-secondary" onclick="rotateCropper(90)" title="Rotate Right">↻</button>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button type="button" class="btn-secondary" onclick="closeCropper()">Batal</button>
-                            <button type="button" class="btn-primary" onclick="cropImage()">Potong & Simpan</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             <div class="form-group">
                 <label class="required" for="nama">Nama Lengkap</label>
                 <input type="text" id="nama" name="nama" required placeholder="Contoh: Fendy Rahmad Mulia">
@@ -767,7 +818,7 @@
         document.getElementById("btn-prev").addEventListener("click", prevStep);
         document.getElementById("btn-back-preview").addEventListener("click", prevStep);
         document.getElementById("btn-download").addEventListener("click", downloadExcel);
-        document.getElementById("btn-wa").addEventListener("click", shareWhatsApp);
+        document.getElementById("btn-wa").addEventListener("click", showWhatsappModal);
         document.getElementById("btn-faker").addEventListener("click", fillFakeData);
         document.getElementById("btn-add-keluarga").addEventListener("click", addKeluarga);
         document.getElementById("btn-add-pendidikan").addEventListener("click", addPendidikan);
@@ -1690,6 +1741,20 @@
         document.getElementById("cv-form").dispatchEvent(new Event('input'));
     }
 
+    // WHATSAPP MODAL FUNCTIONS
+    function showWhatsappModal() {
+        document.getElementById('whatsapp-modal').style.display = 'flex';
+    }
+
+    function closeWhatsappModal() {
+        document.getElementById('whatsapp-modal').style.display = 'none';
+    }
+
+    function confirmWhatsapp() {
+        closeWhatsappModal();
+        shareWhatsApp();
+    }
+
     async function shareWhatsApp() {
         const btn = document.getElementById("btn-wa");
         const originalText = btn.innerHTML;
@@ -1854,5 +1919,48 @@
         originalImageData = null;
     }
 </script>
+
+    <!-- Cropper Modal -->
+    <div id="cropper-modal" class="cropper-modal-overlay">
+        <div class="cropper-container-wrapper">
+            <h3 style="margin-top:0">Potong Foto (3:4)</h3>
+            <div class="cropper-area">
+                <img id="cropper-image" src="" style="max-width: 100%;">
+            </div>
+            <div class="cropper-footer" style="justify-content: space-between;">
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn-secondary" onclick="rotateCropper(-90)" title="Rotate Left">↺</button>
+                    <button type="button" class="btn-secondary" onclick="rotateCropper(90)" title="Rotate Right">↻</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary" onclick="closeCropper()">Batal</button>
+                    <button type="button" class="btn-primary" onclick="cropImage()">Potong & Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Modal -->
+    <div id="whatsapp-modal" class="whatsapp-modal-overlay">
+        <div class="whatsapp-modal-card">
+            <div class="whatsapp-modal-header">
+                <span style="font-size: 1.5rem;">⚠️</span>
+                <h3>Perhatian Sebelum Berbagi 📎</h3>
+            </div>
+            <div class="whatsapp-modal-body">
+                <p>WhatsApp tidak mendukung lampiran file otomatis. Setelah diarahkan ke WhatsApp, Anda perlu melampirkan file CV secara manual dengan langkah berikut:</p>
+                <ol>
+                    <li>File CV sudah otomatis terunduh ke perangkat Anda.</li>
+                    <li>Di WhatsApp, klik ikon 📎 (lampiran).</li>
+                    <li>Pilih file CV yang sudah diunduh.</li>
+                    <li>Kirim ke kontak yang dituju.</li>
+                </ol>
+            </div>
+            <div class="whatsapp-modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeWhatsappModal()">Batal</button>
+                <button type="button" class="btn-success" id="btn-whatsapp-confirm" onclick="confirmWhatsapp()">Mengerti, Lanjut ke WhatsApp</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
