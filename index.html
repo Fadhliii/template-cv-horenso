@@ -680,12 +680,24 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="required" for="alasan">Alasan / Motivasi (Jepang/Romaji)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="alasan" style="margin-bottom: 0;">Alasan / Motivasi (Jepang/Romaji)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('alasan', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="alasan" name="alasan" required placeholder="Contoh: 日本の優れた働き方を通じて自己成長したいと考えています..."></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="pekerjaan_nanti">Pekerjaan yang diinginkan setelah pulang</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="pekerjaan_nanti" style="margin-bottom: 0;">Pekerjaan yang diinginkan setelah pulang</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('pekerjaan_nanti', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="pekerjaan_nanti" name="pekerjaan_nanti" required placeholder="Contoh: インターンシップで得た知識を活かしながら..."></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
@@ -1008,8 +1020,14 @@
                             <input type="text" id="work_company_${i}" name="work_company_${i}">
                         </div>
                         <div class="col form-group">
-                            <label for="work_job_${i}">Posisi / Pekerjaan</label>
-                            <input type="text" id="work_job_${i}" name="work_job_${i}">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <label for="work_job_${i}" style="margin-bottom: 0;">Posisi / Pekerjaan</label>
+                                <button type="button" class="btn-secondary" onclick="translateText('work_job_${i}', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    Terjemahkan
+                                </button>
+                            </div>
+                            <input type="text" id="work_job_${i}" name="work_job_${i}" placeholder="contoh: 社員">
                         </div>
                     </div>
                 </div>
