@@ -25,7 +25,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Meiryo', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -745,17 +745,35 @@
         <div class="card" id="step-8">
             <h2 class="card-title">Lain-lain</h2>
             <div class="form-group">
-                <label class="required" for="hobi">Hobi & Keahlian Khusus (趣味・特技)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="hobi" style="margin-bottom: 0;">Hobi & Keahlian Khusus (趣味・特技)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('hobi', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="hobi" name="hobi" required placeholder="Contoh: 趣味はジョギングすることです"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="kepribadian">Kepribadian & Kelebihan (性格・アピールポイントなど)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="kepribadian" style="margin-bottom: 0;">Kepribadian & Kelebihan (性格・アピールポイントなど)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('kepribadian', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="kepribadian" name="kepribadian" required placeholder="Jelaskan kelebihan dan kekurangan Anda"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="komitmen">Komitmen saat magang (実習するうえで心がけること)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="komitmen" style="margin-bottom: 0;">Komitmen saat magang (実習するうえで心がけること)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('komitmen', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="komitmen" name="komitmen" required placeholder="Contoh: 粘り強く、規律を守り、チームで協力して働くことができる人間です。"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
@@ -779,7 +797,7 @@
                 </button>
                 <button type="button" class="btn-success" id="btn-wa" onclick="showWhatsappModal()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                    Share WhatsApp
+                    Share via WhatsApp
                 </button>
             </div>
             <p style="text-align: center; font-size: 0.85rem; color: #5f6368; margin-top: 1rem;">
@@ -1928,6 +1946,40 @@
         document.getElementById('foto_preview').src = '';
         document.getElementById('foto_preview_container').style.display = 'none';
         originalImageData = null;
+    }
+
+    // TRANSLATION API
+    async function translateText(fieldId, btn) {
+        const textarea = document.getElementById(fieldId);
+        const text = textarea.value.trim();
+        
+        if (!text) {
+            alert('Silakan isi teks terlebih dahulu sebelum menerjemahkan.');
+            return;
+        }
+
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '⏳ Menerjemahkan...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=id|ja`);
+            const data = await response.json();
+            
+            if (data.responseData && data.responseData.translatedText) {
+                textarea.value = data.responseData.translatedText;
+                textarea.closest('.form-group').classList.remove('has-error');
+                textarea.dispatchEvent(new Event('input')); // Trigger autosave
+            } else {
+                throw new Error('Terjemahan gagal');
+            }
+        } catch (error) {
+            console.error('Error translation:', error);
+            alert('Maaf, layanan terjemahan gagal. Pastikan ada koneksi internet atau coba lagi nanti.');
+        } finally {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+        }
     }
 </script>
 
