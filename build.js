@@ -30,7 +30,7 @@ const htmlContent = `<!DOCTYPE html>
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Meiryo', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -685,12 +685,24 @@ const htmlContent = `<!DOCTYPE html>
                 </div>
             </div>
             <div class="form-group">
-                <label class="required" for="alasan">Alasan / Motivasi (Jepang/Romaji)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="alasan" style="margin-bottom: 0;">Alasan / Motivasi (Jepang/Romaji)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('alasan', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="alasan" name="alasan" required placeholder="Contoh: 日本の優れた働き方を通じて自己成長したいと考えています..."></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="pekerjaan_nanti">Pekerjaan yang diinginkan setelah pulang</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="pekerjaan_nanti" style="margin-bottom: 0;">Pekerjaan yang diinginkan setelah pulang</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('pekerjaan_nanti', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="pekerjaan_nanti" name="pekerjaan_nanti" required placeholder="Contoh: インターンシップで得た知識を活かしながら..."></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
@@ -750,17 +762,35 @@ const htmlContent = `<!DOCTYPE html>
         <div class="card" id="step-8">
             <h2 class="card-title">Lain-lain</h2>
             <div class="form-group">
-                <label class="required" for="hobi">Hobi & Keahlian Khusus (趣味・特技)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="hobi" style="margin-bottom: 0;">Hobi & Keahlian Khusus (趣味・特技)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('hobi', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="hobi" name="hobi" required placeholder="Contoh: 趣味はジョギングすることです"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="kepribadian">Kepribadian & Kelebihan (性格・アピールポイントなど)</label>
-                <textarea id="kepribadian" name="kepribadian" required placeholder="Jelaskan kelebihan dan kekurangan Anda"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="kepribadian" style="margin-bottom: 0;">Kelebihan dan Kekurangan (長所・短所)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('kepribadian', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
+                <textarea id="kepribadian" name="kepribadian" required placeholder="長所：明るく、新しいことに挑戦するのが得意です。&#10;短所：心配性な面がありますが、何事も入念に準備して行動します。"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="komitmen">Komitmen saat magang (実習するうえで心がけること)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="komitmen" style="margin-bottom: 0;">Komitmen saat magang (実習するうえで心がけること)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('komitmen', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
                 <textarea id="komitmen" name="komitmen" required placeholder="Contoh: 粘り強く、規律を守り、チームで協力して働くことができる人間です。"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
@@ -995,8 +1025,14 @@ const htmlContent = `<!DOCTYPE html>
                             <input type="text" id="work_company_\${i}" name="work_company_\${i}">
                         </div>
                         <div class="col form-group">
-                            <label for="work_job_\${i}">Posisi / Pekerjaan</label>
-                            <input type="text" id="work_job_\${i}" name="work_job_\${i}">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <label for="work_job_\${i}" style="margin-bottom: 0;">Posisi / Pekerjaan</label>
+                                <button type="button" class="btn-secondary" onclick="translateText('work_job_\${i}', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    Terjemahkan
+                                </button>
+                            </div>
+                            <input type="text" id="work_job_\${i}" name="work_job_\${i}" placeholder="contoh: 社員">
                         </div>
                     </div>
                 </div>
@@ -1631,7 +1667,7 @@ const htmlContent = `<!DOCTYPE html>
             fam_name_1: "SANTOSO", fam_rel_1: "父", fam_age_1: "50", fam_job_1: "会社員", fam_together_1: "〇",
             fam_name_2: "SITI", fam_rel_2: "母", fam_age_2: "45", fam_job_2: "主婦", fam_together_2: "〇",
             hobi: "サッカー、音楽鑑賞",
-            kepribadian: "明るくて、新しいことを学ぶのが好きです。チームで協力することができます。",
+            kepribadian: "長所：明るく、新しいことに挑戦するのが得意です。\\n短所：心配性な面がありますが、何事も入念に準備して行動します。",
             komitmen: "ルールを守り、一生懸命働きます。"
         };
 
@@ -1933,6 +1969,40 @@ const htmlContent = `<!DOCTYPE html>
         document.getElementById('foto_preview').src = '';
         document.getElementById('foto_preview_container').style.display = 'none';
         originalImageData = null;
+    }
+
+    // TRANSLATION API
+    async function translateText(fieldId, btn) {
+        const textarea = document.getElementById(fieldId);
+        const text = textarea.value.trim();
+        
+        if (!text) {
+            alert('Silakan isi teks terlebih dahulu sebelum menerjemahkan.');
+            return;
+        }
+
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '⏳ Menerjemahkan...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(\`https://api.mymemory.translated.net/get?q=\${encodeURIComponent(text)}&langpair=id|ja\`);
+            const data = await response.json();
+            
+            if (data.responseData && data.responseData.translatedText) {
+                textarea.value = data.responseData.translatedText;
+                textarea.closest('.form-group').classList.remove('has-error');
+                textarea.dispatchEvent(new Event('input')); // Trigger autosave
+            } else {
+                throw new Error('Terjemahan gagal');
+            }
+        } catch (error) {
+            console.error('Error translation:', error);
+            alert('Maaf, layanan terjemahan gagal. Pastikan ada koneksi internet atau coba lagi nanti.');
+        } finally {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+        }
     }
 </script>
 
