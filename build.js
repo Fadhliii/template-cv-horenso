@@ -29,14 +29,19 @@ const htmlContent = `<!DOCTYPE html>
             --success-color: #188038;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
             font-family: 'Meiryo', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow-x: hidden;
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -48,6 +53,7 @@ const htmlContent = `<!DOCTYPE html>
             margin: 2rem auto;
             padding: 0 4%;
             box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .header {
@@ -196,9 +202,22 @@ const htmlContent = `<!DOCTYPE html>
             min-width: 0;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .col {
                 flex: 1 1 100%;
+            }
+            .container {
+                margin: 1rem auto;
+                padding: 0 10px;
+            }
+            .header, .card {
+                padding: 1.25rem 1rem;
+            }
+            .row {
+                margin: 0;
+            }
+            .preview-table {
+                min-width: 500px;
             }
         }
 
@@ -430,8 +449,8 @@ const htmlContent = `<!DOCTYPE html>
             background-color: white;
             border-radius: 12px;
             padding: 2rem;
-            max-width: 500px;
-            width: 100%;
+            max-width: 90%;
+            width: 500px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             animation: modalSlideUp 0.3s ease-out;
         }
@@ -455,12 +474,19 @@ const htmlContent = `<!DOCTYPE html>
             background-color: white;
             border-radius: 12px;
             padding: 2rem;
-            max-width: 600px;
-            width: 100%;
+            max-width: 90%;
+            width: 600px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             animation: modalSlideUp 0.3s ease-out;
             max-height: 90vh;
             overflow-y: auto;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1.5rem;
         }
 
         @keyframes modalSlideUp {
@@ -517,7 +543,7 @@ const htmlContent = `<!DOCTYPE html>
             <h1>Formulir Pengisian CV LPK</h1>
             <p>Lengkapi data diri Anda di bawah ini. Semua data tersimpan secara lokal dan langsung diunduh dalam format Excel.</p>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button type="button" class="btn-secondary" id="btn-faker" onclick="fillFakeData()" style="font-size: 0.85rem; padding: 0.5rem 1rem; white-space: nowrap; border-color: #fbbc04; color: #b07d00;">✨ Isi Data Dummy</button>
             <button type="button" class="btn-secondary" id="btn-reset" onclick="resetForm()" style="font-size: 0.85rem; padding: 0.5rem 1rem; white-space: nowrap; border-color: #dc3545; color: #dc3545;">🗑️ Reset Data</button>
         </div>
@@ -808,7 +834,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
                     <label class="required" for="kepribadian" style="margin-bottom: 0;">Kelebihan dan Kekurangan (長所・短所)</label>
-                    <div style="display: flex; gap: 6px;">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <button type="button" class="btn-secondary" onclick="translateText('kepribadian', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                             Terjemahkan Bebas
@@ -1417,6 +1443,7 @@ const htmlContent = `<!DOCTYPE html>
         
         // Basic Info
         html += '<h3 class="preview-section-title">Informasi Pribadi</h3>';
+        html += '<div class="table-responsive">';
         html += '<table class="preview-table"><tbody>';
         html += \`<tr><th>Nama Lengkap</th><td>\${data.nama}</td></tr>\`;
         html += \`<tr><th>Furigana</th><td>\${data.furigana}</td></tr>\`;
@@ -1430,18 +1457,22 @@ const htmlContent = `<!DOCTYPE html>
         html += \`<tr><th>Alamat</th><td>\${data.alamat}</td></tr>\`;
         html += \`<tr><th>Kontak</th><td>\${data.no_hp}</td></tr>\`;
         html += '</tbody></table>';
+        html += '</div>';
 
         // Physical & Health
         html += '<h3 class="preview-section-title">Fisik & Kesehatan</h3>';
+        html += '<div class="table-responsive">';
         html += '<table class="preview-table"><tbody>';
         html += \`<tr><th>Tinggi / Berat</th><td>\${data.tinggi} cm / \${data.berat} kg</td></tr>\`;
         html += \`<tr><th>Penglihatan</th><td>Kanan: \${data.mata_kanan} / Kiri: \${data.mata_kiri}</td></tr>\`;
         html += \`<tr><th>Buta Warna</th><td>\${data.buta_warna}</td></tr>\`;
         html += \`<tr><th>Merokok / Alkohol</th><td>\${data.merokok} / \${data.alkohol}</td></tr>\`;
         html += '</tbody></table>';
+        html += '</div>';
 
         // Education
         html += '<h3 class="preview-section-title">Riwayat Pendidikan</h3>';
+        html += '<div class="table-responsive">';
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Sekolah</th><th>Status</th></tr></thead><tbody>';
         for (let i = 1; i <= 4; i++) {
             if (data[\`edu_school_\${i}\`]) {
@@ -1453,9 +1484,11 @@ const htmlContent = `<!DOCTYPE html>
             }
         }
         html += '</tbody></table>';
+        html += '</div>';
 
         // Work
         html += '<h3 class="preview-section-title">Riwayat Pekerjaan</h3>';
+        html += '<div class="table-responsive">';
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Perusahaan</th><th>Posisi</th></tr></thead><tbody>';
         let hasWork = false;
         for (let i = 1; i <= 4; i++) {
@@ -1470,9 +1503,11 @@ const htmlContent = `<!DOCTYPE html>
         }
         if (!hasWork) html += '<tr><td colspan="3" style="text-align:center;">Tidak ada riwayat pekerjaan</td></tr>';
         html += '</tbody></table>';
+        html += '</div>';
 
         // Family
         html += '<h3 class="preview-section-title">Anggota Keluarga</h3>';
+        html += '<div class="table-responsive">';
         html += '<table class="preview-table"><thead><tr><th>Hubungan</th><th>Nama</th><th>Umur</th><th>Tinggal Bersama</th></tr></thead><tbody>';
         for (let i = 1; i <= 4; i++) {
             if (data[\`fam_name_\${i}\`]) {
@@ -1485,6 +1520,7 @@ const htmlContent = `<!DOCTYPE html>
             }
         }
         html += '</tbody></table>';
+        html += '</div>';
         
         html += '</div>';
         
