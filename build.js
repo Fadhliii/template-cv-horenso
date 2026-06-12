@@ -552,7 +552,13 @@ const htmlContent = `<!DOCTYPE html>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
-                <label class="required" for="furigana">Furigana (Katakana)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="furigana" style="margin-bottom: 0;">Furigana (Katakana)</label>
+                    <button type="button" class="btn-secondary" onclick="transliterateNameToKatakana(this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Konversi dari Nama Lengkap
+                    </button>
+                </div>
                 <input type="text" id="furigana" name="furigana" required placeholder="Contoh: フェンディ ラフマド ムリア">
                 <div class="error-message">Wajib diisi</div>
             </div>
@@ -2082,6 +2088,52 @@ const htmlContent = `<!DOCTYPE html>
         // Find the original button next to the label to pass it to translateText
         const originalBtn = document.querySelector("button[onclick=\\"openKepribadianModal(this)\\"]");
         await translateText('kepribadian', originalBtn || modalBtn);
+    }
+
+    async function transliterateNameToKatakana(btn) {
+        const namaInput = document.getElementById('nama');
+        const furiganaInput = document.getElementById('furigana');
+        const text = namaInput.value.trim();
+        
+        if (!text) {
+            alert('Silakan isi Nama Lengkap terlebih dahulu.');
+            return;
+        }
+
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '⏳ Mengonversi...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(\`https://api.mymemory.translated.net/get?q=\${encodeURIComponent(text)}&langpair=id|ja\`);
+            const data = await response.json();
+            
+            if (data.responseData && data.responseData.translatedText) {
+                let result = data.responseData.translatedText.trim();
+                
+                // Replace middle dot (・) with space to keep it clean and match the format of CV
+                result = result.replace(/・/g, ' ');
+                
+                furiganaInput.value = result;
+                
+                // Remove error class if any
+                const formGroup = furiganaInput.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.remove('has-error');
+                }
+                
+                // Trigger input event to trigger autosave/other listeners
+                furiganaInput.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                throw new Error('Konversi gagal');
+            }
+        } catch (error) {
+            console.error('Error in transliteration:', error);
+            alert('Terjadi kesalahan saat mengonversi nama. Silakan isi secara manual.');
+        } finally {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+        }
     }
 </script>
 
