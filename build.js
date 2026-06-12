@@ -2024,11 +2024,18 @@ const htmlContent = `<!DOCTYPE html>
         btn.disabled = true;
 
         try {
-            const response = await fetch(\`https://api.mymemory.translated.net/get?q=\${encodeURIComponent(text)}&langpair=id|ja\`);
+            const response = await fetch(\`https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=ja&dt=t&q=\${encodeURIComponent(text)}\`);
             const data = await response.json();
             
-            if (data.responseData && data.responseData.translatedText) {
-                textarea.value = data.responseData.translatedText;
+            if (data && data[0]) {
+                let result = '';
+                for (let i = 0; i < data[0].length; i++) {
+                    if (data[0][i] && data[0][i][0]) {
+                        result += data[0][i][0];
+                    }
+                }
+                
+                textarea.value = result.trim();
                 textarea.closest('.form-group').classList.remove('has-error');
                 textarea.dispatchEvent(new Event('input')); // Trigger autosave
             } else {
@@ -2110,14 +2117,18 @@ const htmlContent = `<!DOCTYPE html>
         btn.disabled = true;
 
         try {
-            const response = await fetch(\`https://api.mymemory.translated.net/get?q=\${encodeURIComponent(text)}&langpair=id|ja\`);
+            const response = await fetch(\`https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=ja&dt=t&q=\${encodeURIComponent(text)}\`);
             const data = await response.json();
             
-            if (data.responseData && data.responseData.translatedText) {
-                let result = data.responseData.translatedText.trim();
+            if (data && data[0] && data[0][0] && data[0][0][0]) {
+                let result = data[0][0][0].trim();
                 
-                // Replace middle dot (・) with space to keep it clean and match the format of CV
-                result = result.replace(/・/g, ' ');
+                // Apply specific rule adjustments for Indonesian names
+                // Rule 1: "Muhammad" -> ムハンマド
+                result = result.replace(/モハメッド/g, 'ムハンマド').replace(/モハメド/g, 'ムハンマド');
+                
+                // Rule 8: Split compound names with ・ (middle dot)
+                result = result.replace(/\\s+/g, '・');
                 
                 furiganaInput.value = result;
                 
