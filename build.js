@@ -436,6 +436,33 @@ const htmlContent = `<!DOCTYPE html>
             animation: modalSlideUp 0.3s ease-out;
         }
 
+        /* Kepribadian Modal Styles */
+        .kepribadian-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .kepribadian-modal-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: modalSlideUp 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
         @keyframes modalSlideUp {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -775,7 +802,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
                     <label class="required" for="kepribadian" style="margin-bottom: 0;">Kelebihan dan Kekurangan (長所・短所)</label>
-                    <button type="button" class="btn-secondary" onclick="translateText('kepribadian', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                    <button type="button" class="btn-secondary" onclick="openKepribadianModal(this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
                         Terjemahkan
                     </button>
@@ -2004,6 +2031,58 @@ const htmlContent = `<!DOCTYPE html>
             btn.disabled = false;
         }
     }
+
+    // KEPRIBADIAN MODAL FUNCTIONS
+    function openKepribadianModal(btn) {
+        console.log("Opening Kepribadian Modal");
+        const modal = document.getElementById('kepribadian-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            updateKepribadianPreview();
+        } else {
+            console.error("Kepribadian modal element not found!");
+        }
+    }
+
+    function closeKepribadianModal() {
+        console.log("Closing Kepribadian Modal");
+        const modal = document.getElementById('kepribadian-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function updateKepribadianPreview() {
+        const kelebihanVal = document.getElementById('select-kelebihan').value;
+        const kekuranganVal = document.getElementById('select-kekurangan').value;
+        const previewEl = document.getElementById('kepribadian-preview-text');
+        
+        if (previewEl) {
+            previewEl.textContent = \`長所：\${kelebihanVal}点です。\\n短所：\${kekuranganVal}\`;
+        }
+    }
+
+    function applyGeneratedKepribadian() {
+        const kelebihanVal = document.getElementById('select-kelebihan').value;
+        const kekuranganVal = document.getElementById('select-kekurangan').value;
+        const textarea = document.getElementById('kepribadian');
+        
+        if (textarea) {
+            textarea.value = \`長所：\${kelebihanVal}点です。\\n短所：\${kekuranganVal}\`;
+            textarea.closest('.form-group').classList.remove('has-error');
+            textarea.dispatchEvent(new Event('input')); // Trigger autosave
+        }
+        closeKepribadianModal();
+    }
+
+    async function translateTextFree() {
+        const modalBtn = document.querySelector("#kepribadian-modal .btn-secondary[onclick='translateTextFree()']");
+        closeKepribadianModal();
+        
+        // Find the original button next to the label to pass it to translateText
+        const originalBtn = document.querySelector("button[onclick=\\"openKepribadianModal(this)\\"]");
+        await translateText('kepribadian', originalBtn || modalBtn);
+    }
 </script>
 
     <!-- Cropper Modal -->
@@ -2045,6 +2124,58 @@ const htmlContent = `<!DOCTYPE html>
             <div class="whatsapp-modal-footer">
                 <button type="button" class="btn-secondary" onclick="closeWhatsappModal()">Batal</button>
                 <button type="button" class="btn-success" id="btn-whatsapp-confirm" onclick="confirmWhatsapp()">Mengerti, Lanjut ke WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kepribadian Translation Modal -->
+    <div id="kepribadian-modal" class="kepribadian-modal-overlay" onclick="if(event.target === this) closeKepribadianModal()">
+        <div class="kepribadian-modal-card">
+            <h3 style="margin-top: 0; margin-bottom: 1rem; color: #1a73e8; display: flex; align-items: center; gap: 8px;">
+                💡 Asisten Terjemahan Kelebihan & Kekurangan (長所・短所ジェネレーター)
+            </h3>
+            <p style="font-size: 0.9rem; color: #5f6368; margin-bottom: 1.5rem;">
+                Pilih kelebihan dan kekurangan Anda dari pilihan di bawah untuk menghasilkan teks Jepang yang <strong>formal dan sopan (Keigo)</strong> untuk CV Anda, atau gunakan terjemahan bebas.
+            </p>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; display: block;">1. Pilih Kelebihan Anda (長所):</label>
+                <select id="select-kelebihan" onchange="updateKepribadianPreview()" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    <option value="協調性があり、チームで協力して働くことができる">Bekerjasama (協調性 - Mudah bekerjasama dalam tim)</option>
+                    <option value="粘り強く、諦めずに最後までやり遂げることができる">Pantang Menyerah (粘り強さ - Tekun & tidak mudah menyerah)</option>
+                    <option value="明るく前向きな性格で、新しいことにも積極的に挑戦する">Ceria & Positif (明るさ・前向き - Ceria & aktif mencoba hal baru)</option>
+                    <option value="誠実で規律を守り、時間や約束を厳守する">Jujur & Disiplin (誠実・規律 - Jujur, disiplin, tepat waktu)</option>
+                    <option value="学習意欲が高く、新しい技術や知識を素早く吸収できる">Cepat Belajar (学習意欲 - Motivasi belajar tinggi & cepat belajar)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; display: block;">2. Pilih Kekurangan Anda (短所):</label>
+                <select id="select-kekurangan" onchange="updateKepribadianPreview()" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                    <option value="心配性なところがありますが、事前に準備を徹底することでカバーしています。">Khawatir / Cemas (心配性 - Solusi: Melakukan persiapan matang)</option>
+                    <option value="少しせっかちな面がありますが、ミスを防ぐために必ずダブルチェックを行うよう心がけています。">Terburu-buru / Kurang Sabar (せっかち - Solusi: Memeriksa ulang pekerjaan)</option>
+                    <option value="人見知りなところがありますが、積極的に笑顔で挨拶し、コミュニケーションを取るよう努めています。">Pemalu (人見知り - Solusi: Aktif menyapa & tersenyum)</option>
+                    <option value="慎重すぎるところがありますが、優先順位を決めて迅速に行動するよう心がけています。">Terlalu Cermat / Lambat (慎重すぎる - Solusi: Membuat prioritas & bertindak cepat)</option>
+                    <option value="頑固な面がありますが、他人の意見をよく聴き、柔軟に対応するよう努めています。">Keras Kepala (頑固 - Solusi: Mendengarkan saran & fleksibel)</option>
+                </select>
+            </div>
+
+            <!-- Preview -->
+            <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <span style="font-size: 0.8rem; font-weight: 600; color: #1a73e8; text-transform: uppercase;">Pratinjau Hasil Terjemahan (Formal & Sopan):</span>
+                <p id="kepribadian-preview-text" style="font-size: 0.95rem; margin: 0.5rem 0 0 0; line-height: 1.6; color: #202124; font-family: monospace; white-space: pre-wrap;"></p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div>
+                    <button type="button" class="btn-secondary" onclick="translateTextFree()" style="font-size: 0.85rem; border-color: #1a73e8; color: #1a73e8; padding: 0.5rem 0.75rem;">
+                        ✍️ Gunakan Terjemahan Bebas (Sesuai Ketikan Anda)
+                    </button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary" onclick="closeKepribadianModal()">Batal</button>
+                    <button type="button" class="btn-primary" onclick="applyGeneratedKepribadian()">Terapkan ke CV</button>
+                </div>
             </div>
         </div>
     </div>
