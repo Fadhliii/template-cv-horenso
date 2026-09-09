@@ -1152,8 +1152,21 @@ const htmlContent = `<!DOCTYPE html>
                             <div class="error-message">Wajib diisi</div>
                         </div>
                         <div class="col form-group">
-                            <label \${i === 1 ? 'class="required"' : ''} for="fam_job_\${i}">Pekerjaan (contoh: 社員)</label>
-                            <input type="text" id="fam_job_\${i}" name="fam_job_\${i}" \${i === 1 ? 'required' : ''}>
+                            <label \${i === 1 ? 'class="required"' : ''} for="fam_job_\${i}">Pekerjaan</label>
+                            <select id="fam_job_\${i}" name="fam_job_\${i}" \${i === 1 ? 'required' : ''}>
+                                <option value="">Pilih Pekerjaan...</option>
+                                <option value="学生">Pelajar / Mahasiswa (学生)</option>
+                                <option value="会社員">Karyawan Swasta (会社員)</option>
+                                <option value="社員">Pegawai / Karyawan (社員)</option>
+                                <option value="公務員">Pegawai Negeri (公務員)</option>
+                                <option value="自営業">Wiraswasta / Usaha Sendiri (自営業)</option>
+                                <option value="農業">Petani (農業)</option>
+                                <option value="商業">Pedagang (商業)</option>
+                                <option value="主婦">Ibu Rumah Tangga (主婦)</option>
+                                <option value="幼年">Belum Sekolah / Balita (幼年)</option>
+                                <option value="無職">Tidak Bekerja (無職)</option>
+                                <option value="-">Lainnya / -</option>
+                            </select>
                             <div class="error-message">Wajib diisi</div>
                         </div>
                     </div>
@@ -1508,13 +1521,14 @@ const htmlContent = `<!DOCTYPE html>
         // Family
         html += '<h3 class="preview-section-title">Anggota Keluarga</h3>';
         html += '<div class="table-responsive">';
-        html += '<table class="preview-table"><thead><tr><th>Hubungan</th><th>Nama</th><th>Umur</th><th>Tinggal Bersama</th></tr></thead><tbody>';
+        html += '<table class="preview-table"><thead><tr><th>Hubungan</th><th>Nama</th><th>Umur</th><th>Pekerjaan</th><th>Tinggal Bersama</th></tr></thead><tbody>';
         for (let i = 1; i <= 15; i++) {
             if (data[\`fam_name_\${i}\`]) {
                 html += \`<tr>
                     <td>\${data[\`fam_rel_\${i}\`]}</td>
                     <td>\${data[\`fam_name_\${i}\`]}</td>
                     <td>\${data[\`fam_age_\${i}\`]}歳</td>
+                    <td>\${data[\`fam_job_\${i}\`] || '-'}</td>
                     <td>\${data[\`fam_together_\${i}\`] === '〇' ? 'Ya' : 'Tidak'}</td>
                 </tr>\`;
             }
