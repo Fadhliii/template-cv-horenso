@@ -1771,6 +1771,18 @@ const htmlContent = `<!DOCTYPE html>
         updateCell(\`A\${komitmenRow}\`, data.komitmen, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(komitmenRow, data.komitmen, 95, 32, 19, 8);
 
+        // Pastikan seluruh sel di worksheet menggunakan font Meiryo
+        sheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const currentFont = cell.font || {};
+                cell.font = {
+                    ...currentFont,
+                    name: 'Meiryo',
+                    family: 2
+                };
+            });
+        });
+
         // Export with ExcelJS
         const newBuffer = await workbook.xlsx.writeBuffer();
         const safeName = (data.nama || 'CV').replace(/[^a-z0-9]/gi, '_').toLowerCase();
