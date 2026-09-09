@@ -1568,11 +1568,58 @@ const htmlContent = `<!DOCTYPE html>
         await workbook.xlsx.load(buffer);
         const sheet = workbook.worksheets[0];
 
-        // Helper to update cell
-        function updateCell(cellAddress, value) {
-            if (value) {
+        // Helper to count lines based on text length and full/half-width characters
+        function calcTextLines(text, maxUnitsPerLine) {
+            if (!text) return 1;
+            const str = String(text);
+            const paragraphs = str.split(/\\r\\n|\\r|\\n/);
+            let total = 0;
+            for (const p of paragraphs) {
+                if (p.length === 0) {
+                    total += 1;
+                    continue;
+                }
+                let cur = 0;
+                let lines = 1;
+                for (let i = 0; i < p.length; i++) {
+                    const code = p.charCodeAt(i);
+                    // Japanese/CJK full-width characters count as 2 units, ASCII as 1 unit
+                    const w = (code >= 0x3000 && code <= 0x9FFF) || (code >= 0xFF00 && code <= 0xFFEF) ? 2 : 1;
+                    if (cur + w > maxUnitsPerLine) {
+                        lines++;
+                        cur = w;
+                    } else {
+                        cur += w;
+                    }
+                }
+                total += lines;
+            }
+            return Math.max(1, total);
+        }
+
+        // Helper to adjust row height dynamically based on content length
+        function setRowAutoHeight(rowNum, text, maxUnits, minHeight = 25, lineHeight = 19, padding = 8) {
+            if (!text) return;
+            const lines = calcTextLines(text, maxUnits);
+            const row = sheet.getRow(rowNum);
+            const neededHeight = Math.max(minHeight, lines * lineHeight + padding);
+            row.height = neededHeight;
+        }
+
+        // Helper to update cell with optional alignment/wrapText
+        function updateCell(cellAddress, value, options = {}) {
+            if (value !== undefined && value !== null) {
                 const cell = sheet.getCell(cellAddress);
                 cell.value = value;
+                if (options.wrapText !== undefined || options.vertical || options.horizontal) {
+                    const currentAlign = cell.alignment || {};
+                    cell.alignment = {
+                        ...currentAlign,
+                        ...(options.wrapText !== undefined ? { wrapText: options.wrapText } : {}),
+                        ...(options.vertical ? { vertical: options.vertical } : {}),
+                        ...(options.horizontal ? { horizontal: options.horizontal } : {})
+                    };
+                }
             }
         }
 
@@ -1617,11 +1664,12 @@ const htmlContent = `<!DOCTYPE html>
         }
         updateCell('J6', data.umur ? \`\${data.umur}歳\` : '');
         
-        updateCell('D7', data.alamat);
+        updateCell('D7', data.alamat, { wrapText: true, horizontal: 'left', vertical: 'middle' });
+        setRowAutoHeight(7, data.alamat, 65, 41.5, 18, 6);
         
         updateCell('C9', Number(data.tinggi) || data.tinggi);
         updateCell('G9', Number(data.berat) || data.berat);
-        updateCell('J9', \`右目：\${data.mata_kanan}\\n左目：\${data.mata_kiri}\`);
+        updateCell('J9', \`右目：\${data.mata_kanan}\\n左目：\${data.mata_kiri}\`, { wrapText: true, horizontal: 'center', vertical: 'middle' });
         updateCell('N9', data.buta_warna);
         
         updateCell('C10', data.tangan_dominan);
@@ -1629,14 +1677,18 @@ const htmlContent = `<!DOCTYPE html>
         updateCell('J10', data.alkohol);
         updateCell('N10', data.riwayat_penyakit);
         
-        updateCell('E12', data.mata_pelajaran);
+        updateCell('E12', data.mata_pelajaran, { wrapText: true, horizontal: 'left', vertical: 'middle' });
         updateCell('J12', data.pengalaman_asrama);
         
         updateCell('E13', data.pendapatan);
         updateCell('J13', data.target_tabungan);
         
-        updateCell('G15', data.alasan);
-        updateCell('G16', data.pekerjaan_nanti);
+        updateCell('G15', data.alasan, { wrapText: true, horizontal: 'left', vertical: 'top' });
+        setRowAutoHeight(15, data.alasan, 65, 48, 20, 8);
+
+        updateCell('G16', data.pekerjaan_nanti, { wrapText: true, horizontal: 'left', vertical: 'top' });
+        setRowAutoHeight(16, data.pekerjaan_nanti, 65, 31, 20, 8);
+
         updateCell('G17', data.pengalaman_visa);
 
         // Education (Rows 21, 22, 23, 24)
@@ -1644,7 +1696,7 @@ const htmlContent = `<!DOCTYPE html>
             const row = 20 + i;
             updateCell(\`A\${row}\`, formatYear(data[\`edu_start_\${i}\`]));
             updateCell(\`D\${row}\`, formatYear(data[\`edu_end_\${i}\`]));
-            updateCell(\`F\${row}\`, data[\`edu_school_\${i}\`]);
+            updateCell(\`F\${row}\`, data[\`edu_school_\${i}\`], { wrapText: true, vertical: 'middle' });
             updateCell(\`J\${row}\`, data[\`edu_cert_\${i}\`]);
         }
 
@@ -1653,8 +1705,8 @@ const htmlContent = `<!DOCTYPE html>
             const row = 27 + i;
             updateCell(\`A\${row}\`, formatYear(data[\`work_start_\${i}\`]));
             updateCell(\`D\${row}\`, formatYear(data[\`work_end_\${i}\`]));
-            updateCell(\`F\${row}\`, data[\`work_company_\${i}\`]);
-            updateCell(\`J\${row}\`, data[\`work_job_\${i}\`]);
+            updateCell(\`F\${row}\`, data[\`work_company_\${i}\`], { wrapText: true, vertical: 'middle' });
+            updateCell(\`J\${row}\`, data[\`work_job_\${i}\`], { wrapText: true, vertical: 'middle' });
         }
 
         // Family
@@ -1683,10 +1735,10 @@ const htmlContent = `<!DOCTYPE html>
             const row = 33 + i;
             if (i <= famCount && data[\`fam_name_\${i}\`]) {
                 updateCell(\`A\${row}\`, Number(i));
-                updateCell(\`B\${row}\`, data[\`fam_name_\${i}\`]);
+                updateCell(\`B\${row}\`, data[\`fam_name_\${i}\`], { wrapText: true, vertical: 'middle' });
                 updateCell(\`H\${row}\`, data[\`fam_rel_\${i}\`]);
                 updateCell(\`I\${row}\`, data[\`fam_age_\${i}\`] ? data[\`fam_age_\${i}\`] + '歳' : '');
-                updateCell(\`J\${row}\`, data[\`fam_job_\${i}\`]);
+                updateCell(\`J\${row}\`, data[\`fam_job_\${i}\`], { wrapText: true, vertical: 'middle' });
                 
                 if (data[\`fam_together_\${i}\`] === '〇') {
                     updateCell(\`K\${row}\`, '〇');
@@ -1710,9 +1762,14 @@ const htmlContent = `<!DOCTYPE html>
         const kepribadianRow = 43 + extraRows;
         const komitmenRow = 47 + extraRows;
 
-        updateCell(\`A\${hobiRow}\`, data.hobi);
-        updateCell(\`A\${kepribadianRow}\`, data.kepribadian);
-        updateCell(\`A\${komitmenRow}\`, data.komitmen);
+        updateCell(\`A\${hobiRow}\`, data.hobi, { wrapText: true, horizontal: 'left', vertical: 'top' });
+        setRowAutoHeight(hobiRow, data.hobi, 95, 29, 19, 8);
+
+        updateCell(\`A\${kepribadianRow}\`, data.kepribadian, { wrapText: true, horizontal: 'left', vertical: 'top' });
+        setRowAutoHeight(kepribadianRow, data.kepribadian, 95, 35, 19, 8);
+
+        updateCell(\`A\${komitmenRow}\`, data.komitmen, { wrapText: true, horizontal: 'left', vertical: 'top' });
+        setRowAutoHeight(komitmenRow, data.komitmen, 95, 32, 19, 8);
 
         // Export with ExcelJS
         const newBuffer = await workbook.xlsx.writeBuffer();
