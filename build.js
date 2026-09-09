@@ -1109,9 +1109,9 @@ const htmlContent = `<!DOCTYPE html>
             attachYearFormatter(\`work_end_\${i}\`);
         }
 
-        // Keluarga (4 max)
+        // Keluarga (15 max)
         let famHtml = '';
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 15; i++) {
             famHtml += \`
                 <div class="repeated-group" id="keluarga_group_\${i}" style="\${i > 1 ? 'display: none;' : ''}">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -1280,13 +1280,13 @@ const htmlContent = `<!DOCTYPE html>
             calculateAge();
             
             // Reveal family members if they have data
-            for (let i = 2; i <= 4; i++) {
+            for (let i = 2; i <= 15; i++) {
                 if (data[\`fam_name_\${i}\`]) {
                     document.getElementById(\`keluarga_group_\${i}\`).style.display = 'block';
                     currentKeluargaCount = i;
                 }
             }
-            if (currentKeluargaCount >= 4) {
+            if (currentKeluargaCount >= 15) {
                 document.getElementById('btn-add-keluarga').style.display = 'none';
             }
             
@@ -1317,14 +1317,14 @@ const htmlContent = `<!DOCTYPE html>
     // DYNAMIC ADD KELUARGA
     let currentKeluargaCount = 1;
     function addKeluarga() {
-        if (currentKeluargaCount < 4) {
+        if (currentKeluargaCount < 15) {
             currentKeluargaCount++;
             const group = document.getElementById(\`keluarga_group_\${currentKeluargaCount}\`);
             if (group) {
                 group.style.display = 'block';
                 group.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            if (currentKeluargaCount >= 4) {
+            if (currentKeluargaCount >= 15) {
                 document.getElementById('btn-add-keluarga').style.display = 'none';
             }
         }
@@ -1509,7 +1509,7 @@ const htmlContent = `<!DOCTYPE html>
         html += '<h3 class="preview-section-title">Anggota Keluarga</h3>';
         html += '<div class="table-responsive">';
         html += '<table class="preview-table"><thead><tr><th>Hubungan</th><th>Nama</th><th>Umur</th><th>Tinggal Bersama</th></tr></thead><tbody>';
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 15; i++) {
             if (data[\`fam_name_\${i}\`]) {
                 html += \`<tr>
                     <td>\${data[\`fam_rel_\${i}\`]}</td>
@@ -1643,10 +1643,31 @@ const htmlContent = `<!DOCTYPE html>
             updateCell(\`J\${row}\`, data[\`work_job_\${i}\`]);
         }
 
-        // Family (Rows 34, 35, 36, 37)
-        for(let i=1; i<=4; i++) {
+        // Family
+        let famCount = 0;
+        for (let i = 1; i <= 15; i++) {
+            if (data[\`fam_name_\${i}\`]) {
+                famCount = i;
+            }
+        }
+
+        const extraRows = Math.max(0, famCount - 6);
+        for (let e = 0; e < extraRows; e++) {
+            worksheet.spliceRows(39, 0, []);
+            const newRow = worksheet.getRow(39);
+            const sampleRow = worksheet.getRow(38);
+            newRow.height = sampleRow.height;
+            for (let c = 1; c <= 15; c++) {
+                const sampleCell = sampleRow.getCell(c);
+                const targetCell = newRow.getCell(c);
+                targetCell.style = Object.assign({}, sampleCell.style);
+            }
+        }
+
+        const totalExportRows = Math.max(famCount, 6);
+        for (let i = 1; i <= totalExportRows; i++) {
             const row = 33 + i;
-            if(data[\`fam_name_\${i}\`]) {
+            if (i <= famCount && data[\`fam_name_\${i}\`]) {
                 updateCell(\`A\${row}\`, Number(i));
                 updateCell(\`B\${row}\`, data[\`fam_name_\${i}\`]);
                 updateCell(\`H\${row}\`, data[\`fam_rel_\${i}\`]);
@@ -1660,12 +1681,24 @@ const htmlContent = `<!DOCTYPE html>
                     updateCell(\`K\${row}\`, '');
                     updateCell(\`N\${row}\`, '〇');
                 }
+            } else if (i <= 6) {
+                updateCell(\`A\${row}\`, '');
+                updateCell(\`B\${row}\`, '');
+                updateCell(\`H\${row}\`, '');
+                updateCell(\`I\${row}\`, '');
+                updateCell(\`J\${row}\`, '');
+                updateCell(\`K\${row}\`, '');
+                updateCell(\`N\${row}\`, '');
             }
         }
 
-        updateCell('A41', data.hobi);
-        updateCell('A43', data.kepribadian);
-        updateCell('A47', data.komitmen);
+        const hobiRow = 41 + extraRows;
+        const kepribadianRow = 43 + extraRows;
+        const komitmenRow = 47 + extraRows;
+
+        updateCell(\`A\${hobiRow}\`, data.hobi);
+        updateCell(\`A\${kepribadianRow}\`, data.kepribadian);
+        updateCell(\`A\${komitmenRow}\`, data.komitmen);
 
         // Export with ExcelJS
         const newBuffer = await workbook.xlsx.writeBuffer();
@@ -1763,14 +1796,14 @@ const htmlContent = `<!DOCTYPE html>
         }
         
         // Reveal family members generated by faker
-        for (let i = 2; i <= 4; i++) {
+        for (let i = 2; i <= 15; i++) {
             if (dummyData[\`fam_name_\${i}\`]) {
                 const grp = document.getElementById(\`keluarga_group_\${i}\`);
                 if (grp) grp.style.display = 'block';
                 currentKeluargaCount = i;
             }
         }
-        if (currentKeluargaCount >= 4) {
+        if (currentKeluargaCount >= 15) {
             document.getElementById('btn-add-keluarga').style.display = 'none';
         }
 
