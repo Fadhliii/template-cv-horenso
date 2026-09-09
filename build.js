@@ -1678,10 +1678,10 @@ const htmlContent = `<!DOCTYPE html>
         updateCell('N10', data.riwayat_penyakit);
         
         updateCell('E12', data.mata_pelajaran, { wrapText: true, horizontal: 'left', vertical: 'middle' });
-        updateCell('J12', data.pengalaman_asrama);
+        updateCell('K12', data.pengalaman_asrama);
         
         updateCell('E13', data.pendapatan);
-        updateCell('J13', data.target_tabungan);
+        updateCell('K13', data.target_tabungan);
         
         updateCell('G15', data.alasan, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(15, data.alasan, 65, 48, 20, 8);
