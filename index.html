@@ -999,6 +999,23 @@
         return val;
     }
 
+    // WORK DATE FORMATTER HELPER
+    function formatWorkDate(year, month) {
+        if (!year && !month) return '';
+        const y = year ? String(year).trim().replace(/年$/, '') : '';
+        const m = month ? String(month).trim().replace(/月$/, '') : '';
+        if (y && m) {
+            return `${y}年${m}月`;
+        }
+        if (y) {
+            return `${y}年`;
+        }
+        if (m) {
+            return `${m}月`;
+        }
+        return '';
+    }
+
     // Attach year formatter to inputs
     function attachYearFormatter(id) {
         const input = document.getElementById(id);
@@ -1071,18 +1088,52 @@
                     </div>
                     <div class="row">
                         <div class="col form-group">
-                            <label for="work_start_${i}">Tahun Mulai (hanya angka, misal: 2021)</label>
-                            <input type="text" id="work_start_${i}" name="work_start_${i}" placeholder="Contoh: 2021">
+                            <label>Waktu Mulai Bekerja</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select id="work_start_month_${i}" name="work_start_month_${i}" style="flex: 1.2;">
+                                    <option value="">Bulan...</option>
+                                    <option value="1">1 (Januari)</option>
+                                    <option value="2">2 (Februari)</option>
+                                    <option value="3">3 (Maret)</option>
+                                    <option value="4">4 (April)</option>
+                                    <option value="5">5 (Mei)</option>
+                                    <option value="6">6 (Juni)</option>
+                                    <option value="7">7 (Juli)</option>
+                                    <option value="8">8 (Agustus)</option>
+                                    <option value="9">9 (September)</option>
+                                    <option value="10">10 (Oktober)</option>
+                                    <option value="11">11 (November)</option>
+                                    <option value="12">12 (Desember)</option>
+                                </select>
+                                <input type="number" id="work_start_year_${i}" name="work_start_year_${i}" placeholder="Tahun (cth: 2021)" min="1970" max="2099" style="flex: 1;">
+                            </div>
                         </div>
                         <div class="col form-group">
-                            <label for="work_end_${i}">Tahun Selesai (hanya angka, misal: 2023)</label>
-                            <input type="text" id="work_end_${i}" name="work_end_${i}" placeholder="Contoh: 2023">
+                            <label>Waktu Selesai Bekerja</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select id="work_end_month_${i}" name="work_end_month_${i}" style="flex: 1.2;">
+                                    <option value="">Bulan...</option>
+                                    <option value="1">1 (Januari)</option>
+                                    <option value="2">2 (Februari)</option>
+                                    <option value="3">3 (Maret)</option>
+                                    <option value="4">4 (April)</option>
+                                    <option value="5">5 (Mei)</option>
+                                    <option value="6">6 (Juni)</option>
+                                    <option value="7">7 (Juli)</option>
+                                    <option value="8">8 (Agustus)</option>
+                                    <option value="9">9 (September)</option>
+                                    <option value="10">10 (Oktober)</option>
+                                    <option value="11">11 (November)</option>
+                                    <option value="12">12 (Desember)</option>
+                                </select>
+                                <input type="number" id="work_end_year_${i}" name="work_end_year_${i}" placeholder="Tahun (cth: 2023)" min="1970" max="2099" style="flex: 1;">
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col form-group">
                             <label for="work_company_${i}">Nama Perusahaan</label>
-                            <input type="text" id="work_company_${i}" name="work_company_${i}">
+                            <input type="text" id="work_company_${i}" name="work_company_${i}" placeholder="Contoh: PT MAJU MUNDUR">
                         </div>
                         <div class="col form-group">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
@@ -1092,18 +1143,13 @@
                                     Terjemahkan
                                 </button>
                             </div>
-                            <input type="text" id="work_job_${i}" name="work_job_${i}" placeholder="contoh: 社員">
+                            <input type="text" id="work_job_${i}" name="work_job_${i}" placeholder="contoh: 溶接工 atau 社員">
                         </div>
                     </div>
                 </div>
             `;
         }
         document.getElementById("pekerjaan-container").innerHTML = workHtml;
-        // Attach formatters
-        for (let i = 1; i <= 4; i++) {
-            attachYearFormatter(`work_start_${i}`);
-            attachYearFormatter(`work_end_${i}`);
-        }
 
         // Keluarga (15 max)
         let famHtml = '';
@@ -1293,6 +1339,26 @@
                 }
             });
             
+            // Backward compatibility for old work_start_i and work_end_i
+            for (let i = 1; i <= 4; i++) {
+                if (data[`work_start_${i}`] && !data[`work_start_year_${i}`]) {
+                    const str = String(data[`work_start_${i}`]).trim();
+                    const match = str.match(/(\d{4})/);
+                    if (match) {
+                        const yearEl = document.getElementById(`work_start_year_${i}`);
+                        if (yearEl) yearEl.value = match[1];
+                    }
+                }
+                if (data[`work_end_${i}`] && !data[`work_end_year_${i}`]) {
+                    const str = String(data[`work_end_${i}`]).trim();
+                    const match = str.match(/(\d{4})/);
+                    if (match) {
+                        const yearEl = document.getElementById(`work_end_year_${i}`);
+                        if (yearEl) yearEl.value = match[1];
+                    }
+                }
+            }
+
             // Trigger calculateAge after loading
             calculateAge();
             
@@ -1320,7 +1386,7 @@
             
             // Reveal pekerjaan if they have data
             for (let i = 2; i <= 4; i++) {
-                if (data[`work_company_${i}`]) {
+                if (data[`work_company_${i}`] || data[`work_start_year_${i}`] || data[`work_start_${i}`]) {
                     document.getElementById(`pekerjaan_group_${i}`).style.display = 'block';
                     currentKerjaCount = i;
                 }
@@ -1432,15 +1498,19 @@
     function removeKerja(index) {
         for (let i = index; i < currentKerjaCount; i++) {
             const nextI = i + 1;
-            document.getElementById(`work_start_${i}`).value = document.getElementById(`work_start_${nextI}`).value;
-            document.getElementById(`work_end_${i}`).value = document.getElementById(`work_end_${nextI}`).value;
+            document.getElementById(`work_start_month_${i}`).value = document.getElementById(`work_start_month_${nextI}`).value;
+            document.getElementById(`work_start_year_${i}`).value = document.getElementById(`work_start_year_${nextI}`).value;
+            document.getElementById(`work_end_month_${i}`).value = document.getElementById(`work_end_month_${nextI}`).value;
+            document.getElementById(`work_end_year_${i}`).value = document.getElementById(`work_end_year_${nextI}`).value;
             document.getElementById(`work_company_${i}`).value = document.getElementById(`work_company_${nextI}`).value;
             document.getElementById(`work_job_${i}`).value = document.getElementById(`work_job_${nextI}`).value;
         }
         
         const lastI = currentKerjaCount;
-        document.getElementById(`work_start_${lastI}`).value = '';
-        document.getElementById(`work_end_${lastI}`).value = '';
+        document.getElementById(`work_start_month_${lastI}`).value = '';
+        document.getElementById(`work_start_year_${lastI}`).value = '';
+        document.getElementById(`work_end_month_${lastI}`).value = '';
+        document.getElementById(`work_end_year_${lastI}`).value = '';
         document.getElementById(`work_company_${lastI}`).value = '';
         document.getElementById(`work_job_${lastI}`).value = '';
         
@@ -1550,11 +1620,14 @@
         html += '<table class="preview-table"><thead><tr><th>Periode</th><th>Perusahaan</th><th>Posisi</th></tr></thead><tbody>';
         let hasWork = false;
         for (let i = 1; i <= 4; i++) {
-            if (data[`work_company_${i}`]) {
+            if (data[`work_company_${i}`] || data[`work_start_year_${i}`] || data[`work_start_${i}`]) {
                 hasWork = true;
+                const startDate = formatWorkDate(data[`work_start_year_${i}`] || data[`work_start_${i}`], data[`work_start_month_${i}`]);
+                const endDate = formatWorkDate(data[`work_end_year_${i}`] || data[`work_end_${i}`], data[`work_end_month_${i}`]);
+                const period = (startDate && endDate) ? `${startDate} - ${endDate}` : (startDate || endDate || '-');
                 html += `<tr>
-                    <td>${formatYear(data[`work_start_${i}`])} - ${formatYear(data[`work_end_${i}`])}</td>
-                    <td>${data[`work_company_${i}`]}</td>
+                    <td>${period}</td>
+                    <td>${data[`work_company_${i}`] || '-'}</td>
                     <td>${data[`work_job_${i}`] || '-'}</td>
                 </tr>`;
             }
@@ -1768,10 +1841,12 @@
         // Work Exp (Rows 28, 29, 30, 31)
         for(let i=1; i<=4; i++) {
             const row = 27 + i;
-            if (data[`work_company_${i}`]) {
-                updateCell(`A${row}`, formatYear(data[`work_start_${i}`]));
-                updateCell(`D${row}`, formatYear(data[`work_end_${i}`]));
-                updateCell(`F${row}`, data[`work_company_${i}`], { wrapText: true, vertical: 'middle' });
+            if (data[`work_company_${i}`] || data[`work_start_year_${i}`] || data[`work_start_${i}`]) {
+                const startDate = formatWorkDate(data[`work_start_year_${i}`] || data[`work_start_${i}`], data[`work_start_month_${i}`]);
+                const endDate = formatWorkDate(data[`work_end_year_${i}`] || data[`work_end_${i}`], data[`work_end_month_${i}`]);
+                updateCell(`A${row}`, startDate);
+                updateCell(`D${row}`, endDate);
+                updateCell(`F${row}`, data[`work_company_${i}`] || '', { wrapText: true, vertical: 'middle' });
                 updateCell(`J${row}`, data[`work_job_${i}`] || '', { wrapText: true, vertical: 'middle' });
             } else {
                 updateCell(`A${row}`, '');
@@ -1924,10 +1999,10 @@
             edu_start_2: "2015", edu_end_2: "2018", edu_school_2: "SMPN 1 JAKARTA", edu_cert_2: "卒業証明書",
             edu_start_3: "2018", edu_end_3: "2021", edu_school_3: "SMKN 1 JAKARTA", edu_cert_3: "卒業証明書",
             edu_start_4: "", edu_end_4: "", edu_school_4: "", edu_cert_4: "卒業証明書",
-            work_start_1: "2021", work_end_1: "2023", work_company_1: "PT MAJU MUNDUR", work_job_1: "溶接工",
-            work_start_2: "2023", work_end_2: "2025", work_company_2: "PT SEJAHTERA", work_job_2: "溶接工",
-            work_start_3: "", work_end_3: "", work_company_3: "", work_job_3: "",
-            work_start_4: "", work_end_4: "", work_company_4: "", work_job_4: "",
+            work_start_month_1: "4", work_start_year_1: "2021", work_end_month_1: "3", work_end_year_1: "2023", work_company_1: "PT MAJU MUNDUR", work_job_1: "溶接工",
+            work_start_month_2: "4", work_start_year_2: "2023", work_end_month_2: "5", work_end_year_2: "2025", work_company_2: "PT SEJAHTERA", work_job_2: "溶接工",
+            work_start_month_3: "", work_start_year_3: "", work_end_month_3: "", work_end_year_3: "", work_company_3: "", work_job_3: "",
+            work_start_month_4: "", work_start_year_4: "", work_end_month_4: "", work_end_year_4: "", work_company_4: "", work_job_4: "",
             fam_name_1: "SANTOSO", fam_rel_1: "父", fam_age_1: "50", fam_job_1: "会社員", fam_together_1: "〇",
             fam_name_2: "SITI", fam_rel_2: "母", fam_age_2: "45", fam_job_2: "主婦", fam_together_2: "〇",
             hobi: "サッカー、音楽鑑賞",
