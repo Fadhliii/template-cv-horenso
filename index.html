@@ -535,7 +535,13 @@
 <div class="container">
     <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; flex-wrap: wrap;">
         <div>
-            <h1>Formulir Pengisian CV LPK</h1>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0.25rem;">
+                <h1 style="margin: 0; font-size: clamp(1.3rem, 5vw, 2rem); color: var(--text-color);">Formulir Pengisian CV LPK</h1>
+                <span style="font-size: 0.75rem; background-color: #e8f0fe; color: var(--primary-color); padding: 2px 10px; border-radius: 12px; font-weight: 600; border: 1px solid #cce0ff; display: inline-flex; align-items: center; gap: 4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    by Fadhli Muhammad
+                </span>
+            </div>
             <p>Lengkapi data diri Anda di bawah ini. Semua data tersimpan secara lokal dan langsung diunduh dalam format Excel.</p>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -880,6 +886,9 @@
             <p style="text-align: center; font-size: 0.85rem; color: #5f6368; margin-top: 1rem;">
                 * Jika Share WhatsApp tidak muncul, silakan Download Excel lalu kirim manual.
             </p>
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.85rem; color: #5f6368;">
+                CV LPK Generator • <span style="color: var(--primary-color); font-weight: 600;">by Fadhli Muhammad</span>
+            </div>
         </div>
 
         <div class="btn-group">
@@ -887,6 +896,18 @@
             <button type="button" class="btn-primary" id="btn-next">Lanjut</button>
         </div>
     </form>
+
+    <footer style="text-align: center; margin-top: 2rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: #5f6368; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+        <p style="margin: 0; font-weight: 500; color: #3c4043;">Formulir Pengisian CV LPK</p>
+        <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: #70757a;">
+            Watermark: <strong style="color: var(--primary-color); font-weight: 600;">by Fadhli Muhammad</strong>
+        </p>
+    </footer>
+</div>
+
+<div class="watermark-floating" style="position: fixed; bottom: 12px; right: 16px; font-size: 0.75rem; color: #5f6368; background: rgba(255, 255, 255, 0.92); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.08); pointer-events: none; z-index: 999; backdrop-filter: blur(4px); font-weight: 500; display: flex; align-items: center; gap: 6px;">
+    <span style="display: inline-block; width: 7px; height: 7px; background-color: var(--primary-color); border-radius: 50%;"></span>
+    <span>by Fadhli Muhammad</span>
 </div>
 
 <script>
@@ -1929,6 +1950,12 @@
                 };
             });
         });
+
+        // Set Header/Footer watermark on worksheet for printing/export
+        sheet.headerFooter = {
+            oddFooter: "&R by Fadhli Muhammad",
+            evenFooter: "&R by Fadhli Muhammad"
+        };
 
         // Export with ExcelJS
         const newBuffer = await workbook.xlsx.writeBuffer();
