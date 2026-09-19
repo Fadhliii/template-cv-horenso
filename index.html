@@ -2131,6 +2131,12 @@
         // Clear local storage
         localStorage.removeItem('cv_data');
         
+        // Reset undo history
+        document.querySelectorAll("[id^='btn_undo_']").forEach(btn => btn.remove());
+        for (let key in fieldUndoHistory) {
+            delete fieldUndoHistory[key];
+        }
+        
         // Reset dynamic fields (Keluarga)
         for (let i = 2; i <= currentKeluargaCount; i++) {
             const group = document.getElementById(`keluarga_group_${i}`);
@@ -2352,6 +2358,54 @@
         originalImageData = null;
     }
 
+    // UNDO TRANSLATION SYSTEM
+    const fieldUndoHistory = {};
+
+    function saveForUndo(fieldId) {
+        const el = document.getElementById(fieldId);
+        if (el) {
+            fieldUndoHistory[fieldId] = el.value;
+        }
+    }
+
+    function undoTranslation(fieldId) {
+        const el = document.getElementById(fieldId);
+        if (el && fieldUndoHistory[fieldId] !== undefined) {
+            const currentVal = el.value;
+            el.value = fieldUndoHistory[fieldId];
+            fieldUndoHistory[fieldId] = currentVal;
+            
+            const fg = el.closest('.form-group');
+            if (fg) fg.classList.remove('has-error');
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function showUndoButton(fieldId, anchorBtn) {
+        let undoBtn = document.getElementById(`btn_undo_${fieldId}`);
+        if (!undoBtn) {
+            undoBtn = document.createElement('button');
+            undoBtn.type = 'button';
+            undoBtn.id = `btn_undo_${fieldId}`;
+            undoBtn.className = 'btn-secondary';
+            undoBtn.style.cssText = 'font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #ea4335; color: #ea4335; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; cursor: pointer; transition: all 0.2s;';
+            undoBtn.title = 'Kembalikan teks asli sebelum diterjemahkan';
+            undoBtn.innerHTML = `
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Kembalikan Teks Asli
+            `;
+            undoBtn.onclick = function() {
+                undoTranslation(fieldId);
+            };
+            
+            if (anchorBtn && anchorBtn.parentNode) {
+                anchorBtn.parentNode.insertBefore(undoBtn, anchorBtn.nextSibling);
+            }
+        } else {
+            undoBtn.style.display = 'inline-flex';
+        }
+    }
+
     // TRANSLATION API
     async function translateText(fieldId, btn) {
         const textarea = document.getElementById(fieldId);
@@ -2378,9 +2432,11 @@
                     }
                 }
                 
+                saveForUndo(fieldId);
                 textarea.value = result.trim();
                 textarea.closest('.form-group').classList.remove('has-error');
                 textarea.dispatchEvent(new Event('input')); // Trigger autosave
+                showUndoButton(fieldId, btn);
             } else {
                 throw new Error('Terjemahan gagal');
             }
@@ -2429,9 +2485,13 @@
         const textarea = document.getElementById('kepribadian');
         
         if (textarea) {
+            saveForUndo('kepribadian');
             textarea.value = `長所：${kelebihanVal}点です。\n短所：${kekuranganVal}`;
             textarea.closest('.form-group').classList.remove('has-error');
             textarea.dispatchEvent(new Event('input')); // Trigger autosave
+            
+            const originalBtn = document.querySelector("button[onclick=\"openKepribadianModal(this)\"]");
+            showUndoButton('kepribadian', originalBtn);
         }
         closeKepribadianModal();
     }
@@ -2473,6 +2533,7 @@
                 // Rule 8: Split compound names with ・ (middle dot)
                 result = result.replace(/\s+/g, '・');
                 
+                saveForUndo('furigana');
                 furiganaInput.value = result;
                 
                 // Remove error class if any
@@ -2483,6 +2544,7 @@
                 
                 // Trigger input event to trigger autosave/other listeners
                 furiganaInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showUndoButton('furigana', btn);
             } else {
                 throw new Error('Konversi gagal');
             }
