@@ -532,6 +532,36 @@ const htmlContent = `<!DOCTYPE html>
             justify-content: flex-end;
             gap: 12px;
         }
+
+        @media print {
+            .watermark-floating,
+            .watermark-footer-step,
+            a[href*="fadhlimuhammad"],
+            .header a,
+            footer,
+            .action-buttons,
+            .btn-group,
+            #btn-faker,
+            #btn-reset,
+            .step-indicator,
+            .progress-container,
+            button {
+                display: none !important;
+            }
+            body {
+                background-color: #ffffff;
+            }
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -891,7 +921,7 @@ const htmlContent = `<!DOCTYPE html>
             <p style="text-align: center; font-size: 0.85rem; color: #5f6368; margin-top: 1rem;">
                 * Jika Share WhatsApp tidak muncul, silakan Download Excel lalu kirim manual.
             </p>
-            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.85rem; color: #5f6368;">
+            <div class="watermark-footer-step" style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.85rem; color: #5f6368;">
                 CV Generator • <a href="https://www.linkedin.com/in/fadhlimuhammad/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">by Fadhli Muhammad</a>
             </div>
         </div>
@@ -1956,10 +1986,14 @@ const htmlContent = `<!DOCTYPE html>
             });
         });
 
-        // Set Header/Footer watermark on worksheet for printing/export
+        // Clear Header/Footer watermark on worksheet for printing/export
         sheet.headerFooter = {
-            oddFooter: "&R by Fadhli Muhammad",
-            evenFooter: "&R by Fadhli Muhammad"
+            oddHeader: '',
+            evenHeader: '',
+            firstHeader: '',
+            oddFooter: '',
+            evenFooter: '',
+            firstFooter: ''
         };
 
         // Export with ExcelJS
