@@ -870,7 +870,7 @@ const htmlContent = `<!DOCTYPE html>
             </div>
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
-                    <label class="required" for="kepribadian" style="margin-bottom: 0;">Kelebihan dan Kekurangan (長所・短所)</label>
+                    <label class="required" for="kepribadian" style="margin-bottom: 0;">Kepribadian / Sifat (性格・長所短所)</label>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <button type="button" class="btn-secondary" onclick="translateText('kepribadian', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -882,6 +882,17 @@ const htmlContent = `<!DOCTYPE html>
                     </div>
                 </div>
                 <textarea id="kepribadian" name="kepribadian" required placeholder="長所：明るく、新しいことに挑戦するのが得意です。&#10;短所：心配性な面がありますが、何事も入念に準備して行動します。"></textarea>
+                <div class="error-message">Wajib diisi</div>
+            </div>
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="required" for="apiru_point" style="margin-bottom: 0;">Poin Keunggulan / Nilai Jual Diri (アピールポイント)</label>
+                    <button type="button" class="btn-secondary" onclick="translateText('apiru_point', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Terjemahkan
+                    </button>
+                </div>
+                <textarea id="apiru_point" name="apiru_point" required placeholder="Contoh: 明るく前向きな姿勢で何事にも粘り強く取り組み、周囲と円滑に協力して責任を持って業務をやり遂げることができます。"></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
             <div class="form-group">
@@ -1714,11 +1725,12 @@ const htmlContent = `<!DOCTYPE html>
         html += '</div>';
 
         // Step 8: Lain-lain
-        html += renderSectionHeader('8. Lain-lain (Hobi, Kepribadian, Komitmen)', 8);
+        html += renderSectionHeader('8. Lain-lain (Hobi, Kepribadian, Poin Keunggulan, Komitmen)', 8);
         html += '<div class="table-responsive">';
         html += '<table class="preview-table"><tbody>';
         html += \`<tr><th>Hobi & Keahlian</th><td style="white-space: pre-wrap;">\${data.hobi || '-'}</td></tr>\`;
-        html += \`<tr><th>Kelebihan & Kekurangan</th><td style="white-space: pre-wrap;">\${data.kepribadian || '-'}</td></tr>\`;
+        html += \`<tr><th>Kepribadian (性格)</th><td style="white-space: pre-wrap;">\${data.kepribadian || '-'}</td></tr>\`;
+        html += \`<tr><th>Poin Keunggulan (アピールポイント)</th><td style="white-space: pre-wrap;">\${data.apiru_point || '-'}</td></tr>\`;
         html += \`<tr><th>Komitmen saat Magang</th><td style="white-space: pre-wrap;">\${data.komitmen || '-'}</td></tr>\`;
         html += '</tbody></table>';
         html += '</div>';
@@ -1968,8 +1980,19 @@ const htmlContent = `<!DOCTYPE html>
         updateCell(\`A\${hobiRow}\`, data.hobi, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(hobiRow, data.hobi, 95, 29, 19, 8);
 
+        // Update Seikaku (Left column: A) & Apiru Point (Right column: I)
         updateCell(\`A\${kepribadianRow}\`, data.kepribadian, { wrapText: true, horizontal: 'left', vertical: 'top' });
-        setRowAutoHeight(kepribadianRow, data.kepribadian, 95, 35, 19, 8);
+        updateCell(\`I\${kepribadianRow}\`, data.apiru_point, { wrapText: true, horizontal: 'left', vertical: 'top' });
+
+        // Auto height considering both columns (each column width ~ 46 units per line)
+        const seikakuLines = calcTextLines(data.kepribadian, 46);
+        const apiruLines = calcTextLines(data.apiru_point, 46);
+        const maxLines = Math.max(seikakuLines, apiruLines);
+        if (maxLines > 3) {
+            const neededTotal = maxLines * 16 + 10;
+            const extraHeight = Math.max(0, neededTotal - 49.5);
+            sheet.getRow(kepribadianRow).height = 16.5 + extraHeight;
+        }
 
         updateCell(\`A\${komitmenRow}\`, data.komitmen, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(komitmenRow, data.komitmen, 95, 32, 19, 8);
@@ -2073,6 +2096,7 @@ const htmlContent = `<!DOCTYPE html>
             fam_name_2: "SITI", fam_rel_2: "母", fam_age_2: "45", fam_job_2: "主婦", fam_together_2: "〇",
             hobi: "サッカー、音楽鑑賞",
             kepribadian: "長所：明るく、新しいことに挑戦するのが得意です。\\n短所：心配性な面がありますが、何事も入念に準備して行動します。",
+            apiru_point: "明るく前向きな姿勢で何事にも粘り強く取り組み、周囲と円滑に協力して責任を持って業務をやり遂げることができます。",
             komitmen: "ルールを守り、一生懸命働きます。"
         };
 
