@@ -909,7 +909,7 @@ const htmlContent = `<!DOCTYPE html>
             </div>
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
-                    <label class="required" for="komitmen" style="margin-bottom: 0;">Moto Hidup (座右の銘)</label>
+                    <label class="required" for="komitmen" style="margin-bottom: 0;">Moto Hidup (実習するうえで心がけること)</label>
                     <button type="button" class="btn-secondary" onclick="translateText('komitmen', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                         Terjemahkan
@@ -1794,7 +1794,7 @@ const htmlContent = `<!DOCTYPE html>
         html += \`<tr><th>Kelebihan (長所)</th><td style="white-space: pre-wrap;">\${data.kelebihan || '-'}</td></tr>\`;
         html += \`<tr><th>Kekurangan (短所)</th><td style="white-space: pre-wrap;">\${data.kekurangan || '-'}</td></tr>\`;
         html += \`<tr><th>Poin Keunggulan (アピールポイント)</th><td style="white-space: pre-wrap;">\${data.apiru_point || '-'}</td></tr>\`;
-        html += \`<tr><th>Moto Hidup (座右の銘)</th><td style="white-space: pre-wrap;">\${data.komitmen || '-'}</td></tr>\`;
+        html += \`<tr><th>Moto Hidup (実習するうえで心がけること)</th><td style="white-space: pre-wrap;">\${data.komitmen || '-'}</td></tr>\`;
         html += '</tbody></table>';
         html += '</div>';
         
@@ -2064,7 +2064,7 @@ const htmlContent = `<!DOCTYPE html>
         }
 
         const komitmenHeaderRow = 46 + extraRows;
-        updateCell(\`A\${komitmenHeaderRow}\`, '座右の銘');
+        updateCell(\`A\${komitmenHeaderRow}\`, '実習するうえで心がけること');
         updateCell(\`A\${komitmenRow}\`, data.komitmen, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(komitmenRow, data.komitmen, 95, 32, 19, 8);
 
