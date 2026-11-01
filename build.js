@@ -909,13 +909,13 @@ const htmlContent = `<!DOCTYPE html>
             </div>
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
-                    <label class="required" for="komitmen" style="margin-bottom: 0;">Komitmen saat magang (実習するうえで心がけること)</label>
+                    <label class="required" for="komitmen" style="margin-bottom: 0;">Moto Hidup (座右の銘)</label>
                     <button type="button" class="btn-secondary" onclick="translateText('komitmen', this)" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; white-space: nowrap; border-color: #1a73e8; color: #1a73e8; display: flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                         Terjemahkan
                     </button>
                 </div>
-                <textarea id="komitmen" name="komitmen" required placeholder="Contoh: 粘り強く、規律を守り、チームで協力して働くことができる人間です。"></textarea>
+                <textarea id="komitmen" name="komitmen" required placeholder="Contoh: 七転び八起き (Pantang menyerah) atau 継続は力なり (Konsistensi membawa keberhasilan). Ketik bahasa Indonesia lalu klik Terjemahkan."></textarea>
                 <div class="error-message">Wajib diisi</div>
             </div>
         </div>
@@ -1787,14 +1787,14 @@ const htmlContent = `<!DOCTYPE html>
         html += '</div>';
 
         // Step 8: Lain-lain
-        html += renderSectionHeader('8. Lain-lain (Hobi, Kelebihan, Kekurangan, Poin Keunggulan, Komitmen)', 8);
+        html += renderSectionHeader('8. Lain-lain (Hobi, Kelebihan, Kekurangan, Poin Keunggulan, Moto Hidup)', 8);
         html += '<div class="table-responsive">';
         html += '<table class="preview-table"><tbody>';
         html += \`<tr><th>Hobi & Keahlian</th><td style="white-space: pre-wrap;">\${data.hobi || '-'}</td></tr>\`;
         html += \`<tr><th>Kelebihan (長所)</th><td style="white-space: pre-wrap;">\${data.kelebihan || '-'}</td></tr>\`;
         html += \`<tr><th>Kekurangan (短所)</th><td style="white-space: pre-wrap;">\${data.kekurangan || '-'}</td></tr>\`;
         html += \`<tr><th>Poin Keunggulan (アピールポイント)</th><td style="white-space: pre-wrap;">\${data.apiru_point || '-'}</td></tr>\`;
-        html += \`<tr><th>Komitmen saat Magang</th><td style="white-space: pre-wrap;">\${data.komitmen || '-'}</td></tr>\`;
+        html += \`<tr><th>Moto Hidup (座右の銘)</th><td style="white-space: pre-wrap;">\${data.komitmen || '-'}</td></tr>\`;
         html += '</tbody></table>';
         html += '</div>';
         
@@ -2063,6 +2063,8 @@ const htmlContent = `<!DOCTYPE html>
             sheet.getRow(kepribadianRow).height = 16.5 + extraHeight;
         }
 
+        const komitmenHeaderRow = 46 + extraRows;
+        updateCell(\`A\${komitmenHeaderRow}\`, '座右の銘');
         updateCell(\`A\${komitmenRow}\`, data.komitmen, { wrapText: true, horizontal: 'left', vertical: 'top' });
         setRowAutoHeight(komitmenRow, data.komitmen, 95, 32, 19, 8);
 
@@ -2168,7 +2170,7 @@ const htmlContent = `<!DOCTYPE html>
             kekurangan: "心配性な面がありますが、何事も入念に準備して行動します。",
             kepribadian: "長所：明るく、新しいことに挑戦するのが得意です。\\n短所：心配性な面がありますが、何事も入念に準備して行動します。",
             apiru_point: "明るく前向きな姿勢で何事にも粘り強く取り組み、周囲と円滑に協力して責任を持って業務をやり遂げることができます。",
-            komitmen: "ルールを守り、一生懸命働きます。"
+            komitmen: "七転び八起き（失敗しても諦めず、立ち上がって努力し続ける）"
         };
 
         for (const [key, value] of Object.entries(dummyData)) {
